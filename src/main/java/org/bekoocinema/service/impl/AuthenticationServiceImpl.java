@@ -65,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.verifyOtp(user.getEmail(), OTP);
         final long TIME_TOKEN = 1000L * 60 * 60 * 24;
         var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
-        var refreshToken = jwtService.generateToken(user, TIME_TOKEN * 2);
+        var refreshToken = jwtService.generateToken(user, TIME_TOKEN * 7);
 
         return TokenResponse.builder()
                 .tokenContent(tokenContent)
