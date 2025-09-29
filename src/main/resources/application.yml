@@ -11,6 +11,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        search:
+          backend:
+            hosts: ${elastic.host}
+            username: ${elastic.username}
+            password: ${elastic.password}
+            analysis:
+              configurer: org.beautybox.config.ElasticsearchAnalysisConfig
+          schema_management:
+            strategy: create-or-update
     hibernate:
       ddl-auto: update
   mail:
