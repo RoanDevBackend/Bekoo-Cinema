@@ -3,12 +3,10 @@ package org.bekoocinema.request.movie;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateMovieRequest {
+    @NotBlank(message = "Tên phim không được bỏ trống")
+    String name;
     @NotBlank(message = "Tên tác giả không được bỏ trống")
     String director;
     //Diễn viên
@@ -38,8 +38,9 @@ public class CreateMovieRequest {
     String note;
     @Min(value = 0, message = "Giá vé không được nhỏ hơn 0")
     int price;
-    String trailerUrl;
-    String posterUrl;
+    MultipartFile trailerFile;
+    @NotNull(message = "Poster không được để trống")
+    MultipartFile posterFile;
     @NotEmpty
     List<String> genreIds;
 }

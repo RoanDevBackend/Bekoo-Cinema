@@ -52,13 +52,13 @@ public class WebSecurity {
                         configure ->
                                 configure
                                         .requestMatchers(HttpMethod.POST, "/user")
-                                        .permitAll()
+                                            .permitAll()
                                         .requestMatchers(listUnAuthenticate)
-                                        .permitAll()
+                                            .permitAll()
                                         .requestMatchers(HttpMethod.GET ,getMappings)
-                                        .permitAll()
+                                            .permitAll()
                                         .anyRequest()
-                                        .authenticated()
+                                            .authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

@@ -16,7 +16,7 @@ public class MovieController {
     final MovieService movieService;
 
     @PostMapping("/movie")
-    public ApiResponse addMovie(@RequestBody @Valid CreateMovieRequest movieRequest) {
+    public ApiResponse addMovie(@ModelAttribute @Valid CreateMovieRequest movieRequest) {
         movieService.addMovie(movieRequest);
         return ApiResponse.success(201, "Thêm thành công");
     }

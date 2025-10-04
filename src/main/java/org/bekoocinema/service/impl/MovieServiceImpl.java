@@ -1,9 +1,14 @@
 package org.bekoocinema.service.impl;
 
+import com.cloudinary.Cloudinary;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.bekoocinema.entity.Genre;
 import org.bekoocinema.entity.Movie;
+import org.bekoocinema.exception.AppException;
+import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.mapper.MovieMapper;
 import org.bekoocinema.repository.GenreRepository;
 import org.bekoocinema.repository.MovieRepository;
@@ -16,21 +21,27 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MovieServiceImpl implements MovieService {
 
+    final Cloudinary cloudinary;
     final MovieRepository movieRepository;
     final GenreRepository genreRepository;
     final MovieMapper movieMapper;
     final EntityManager entityManager;
 
     @Override
+    @SneakyThrows
     public void addMovie(CreateMovieRequest createMovieRequest) {
         Movie movie = movieMapper.toMovie(createMovieRequest);
         Set<Genre> genres = new HashSet<>();
@@ -38,7 +49,11 @@ public class MovieServiceImpl implements MovieService {
             var genreOptional = genreRepository.findById(id);
             genreOptional.ifPresent(genres::add);
         }
+        String trailerUrl = this.getFileUrl(createMovieRequest.getTrailerFile());
+        String posterUrl = this.getFileUrl(createMovieRequest.getPosterFile());
         movie.setGenres(genres);
+        movie.setTrailerUrl(trailerUrl);
+        movie.setPosterUrl(posterUrl);
         movieRepository.save(movie);
     }
 
@@ -109,6 +124,19 @@ public class MovieServiceImpl implements MovieService {
     private void validPage(int pageIndex, int pageSize){
         if(pageIndex < 1 || pageSize < 1){
             throw new IllegalArgumentException("Số trang và số phần tử trong một trang cần lớn hơn 1");
+        }
+    }
+
+    private String getFileUrl(MultipartFile file) throws IOException {
+        try {
+            if(file == null || file.isEmpty()){
+                return null;
+            }
+            var response = cloudinary.uploader().upload(file.getBytes(), Map.of());
+            return response.get("url").toString();
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new IOException("File không hợp lệ");
         }
     }
 }
