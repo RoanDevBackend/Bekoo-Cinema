@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.movie.CreateMovieRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.MovieService;
@@ -32,7 +33,7 @@ public class MovieController {
             @Parameter(name = "sortDirection", description = "acs/desc"),
             @Parameter(name = "genre", description = "Tìm theo thể loại, không truyền để lấy ra tất cả")
     })
-    @GetMapping("/public-api/movie/filter")
+    @GetMapping(EndPointConstant.PUBLIC + "/movie/filter")
     public ApiResponse filterMovie(@RequestParam(required = false) String searchName,
                                      @RequestParam(required = false) String genre,
                                      @RequestParam(required = false, defaultValue = "0 ") int minPrice,

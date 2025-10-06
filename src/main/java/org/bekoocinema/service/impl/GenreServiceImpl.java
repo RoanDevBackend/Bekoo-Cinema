@@ -6,8 +6,12 @@ import org.bekoocinema.entity.Genre;
 import org.bekoocinema.exception.AppException;
 import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.repository.GenreRepository;
+import org.bekoocinema.response.GenreResponse.GenreResponse;
 import org.bekoocinema.service.GenreService;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -29,5 +33,18 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public void deleteGenre(String genreId) {
         genreRepository.deleteById(genreId);
+    }
+
+    @Override
+    public List<GenreResponse> getAllGenres(String name) {
+        List<Genre> genres = genreRepository.findAllByName(name);
+        List<GenreResponse> genreResponses = new ArrayList<>();
+        for(Genre genre : genres) {
+            GenreResponse genreResponse = new GenreResponse();
+            genreResponse.setId(genre.getId());
+            genreResponse.setName(genre.getName());
+            genreResponses.add(genreResponse);
+        }
+        return genreResponses;
     }
 }

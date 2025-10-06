@@ -1,6 +1,7 @@
 package org.bekoocinema.config;
 
 import lombok.RequiredArgsConstructor;
+import org.bekoocinema.constant.EndPointConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -32,6 +33,7 @@ public class WebSecurity {
             , "/v3/api-docs/**"
             , "/swagger-ui/**"
             , "/swagger-ui.html"
+            , EndPointConstant.PUBLIC + "/**"
     };
 
     final String[] getMappings={
