@@ -7,8 +7,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bekoocinema.entity.Genre;
 import org.bekoocinema.entity.Movie;
-import org.bekoocinema.exception.AppException;
-import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.mapper.MovieMapper;
 import org.bekoocinema.repository.GenreRepository;
 import org.bekoocinema.repository.MovieRepository;
@@ -49,10 +47,8 @@ public class MovieServiceImpl implements MovieService {
             var genreOptional = genreRepository.findById(id);
             genreOptional.ifPresent(genres::add);
         }
-        String trailerUrl = this.getFileUrl(createMovieRequest.getTrailerFile());
         String posterUrl = this.getFileUrl(createMovieRequest.getPosterFile());
         movie.setGenres(genres);
-        movie.setTrailerUrl(trailerUrl);
         movie.setPosterUrl(posterUrl);
         movieRepository.save(movie);
     }

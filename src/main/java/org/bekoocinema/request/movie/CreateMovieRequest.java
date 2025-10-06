@@ -38,7 +38,7 @@ public class CreateMovieRequest {
     String note;
     @Min(value = 0, message = "Giá vé không được nhỏ hơn 0")
     int price;
-    MultipartFile trailerFile;
+    String trailerUrl;
     @NotNull(message = "Poster không được để trống")
     MultipartFile posterFile;
     @NotEmpty
