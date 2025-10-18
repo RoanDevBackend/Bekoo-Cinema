@@ -18,7 +18,7 @@ public class GenreController {
         return ApiResponse.success(201, "Đã thêm thành công");
     }
 
-    @GetMapping(EndPointConstant.PUBLIC)
+    @GetMapping(EndPointConstant.PUBLIC + "/genre")
     public ApiResponse getAllGenres(@RequestParam(required = false, defaultValue = "") String genreName) {
         return ApiResponse.success(200, "Tìm kiếm thành công", genreService.getAllGenres(genreName));
     }

@@ -10,18 +10,16 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Chair {
+public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    String seatName;
+    int price;
     int colIdx;
     int rowIdx;
     String status;
     @ManyToOne
-    @JoinColumn(name = "chair_type_id")
-    ChairType chairType;
-    @ManyToOne
     @JoinColumn(name = "room_id")
     Room room;
-
 }

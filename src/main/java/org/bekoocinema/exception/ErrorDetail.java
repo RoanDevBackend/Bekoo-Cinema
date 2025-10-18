@@ -12,6 +12,7 @@ public enum ErrorDetail {
     , ERR_WHILE_UPLOAD(400, "Có lỗi trong khi upload ảnh")
     , ERR_ORDER_USER_NOT_CORRECT(400, "Thao tác này chỉ được thực hiện với dữ liệu của bạn")
     , ERR_IMAGE_NOT_EXISTED(400, "Không tìm thấy thông tin ảnh")
+    , ERR_CINEMA_NOT_EXISTED(400, "Rạp phim không tồn tại")
     ;
 
     private final int code;

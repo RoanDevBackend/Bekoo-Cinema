@@ -19,10 +19,13 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
-    String structure;
-    LocalDateTime startTime;
+    int totalRow;
+    int totalCol;
+    @ManyToOne
+            @JoinColumn(name = "cinema_id", nullable = false)
+    Cinema cinema;
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Showtime> showtimes = new HashSet<>();
     @OneToMany(mappedBy = "room")
-    Set<Chair> chairs = new HashSet<>();
+    Set<Seat> seats = new HashSet<>();
 }
