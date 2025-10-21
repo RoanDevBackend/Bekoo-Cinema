@@ -33,6 +33,7 @@ public class WebSecurity {
             , "/v3/api-docs/**"
             , "/swagger-ui/**"
             , "/swagger-ui.html"
+            , "/forgot-password"
             , EndPointConstant.PUBLIC + "/**"
     };
 
@@ -43,7 +44,6 @@ public class WebSecurity {
 //            "/token/refresh/**"
 //            ,"/specialize/query-all"
     };
-
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -67,7 +67,6 @@ public class WebSecurity {
                 .addFilterBefore(jwtAuthenticationFilter , UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
 
     @Bean
     CorsFilter corsFilter(){
