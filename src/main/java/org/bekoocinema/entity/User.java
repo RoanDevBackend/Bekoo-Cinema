@@ -30,6 +30,8 @@ public class User extends BaseEntity implements UserDetails {
     String password;
     String phone;
     String role;
+    Status status = Status.ACTIVE;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> role=  new ArrayList<>();

@@ -7,6 +7,7 @@ public enum ErrorDetail {
     ERR_USER_EMAIL_EXISTED(400, "Email đã tồn tại")
     , ERR_USER_UN_AUTHENTICATE(401, "Sai tên đăng nhập hoặc mật khẩu")
     , ERR_USER_NOT_EXISTED(404, "Người dùng không tồn tại")
+    , ERR_USER_CANNOT_DELETE_SELF(400, "Không thể xóa tài khoản của chính bạn")
     , ERR_GENRE_EXISTED(400, "Thể loại đã tồn tại")
     , ERR_CATEGORY_NOT_EXISTED(400, "Thể loại không tồn tại")
     , ERR_WHILE_UPLOAD(400, "Có lỗi trong khi upload ảnh")
