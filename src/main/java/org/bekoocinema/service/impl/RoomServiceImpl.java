@@ -68,22 +68,19 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public RoomResponse getRoomById(String id) {
-        Room room = roomRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Phòng không tồn tại")
-        );
-        RoomResponse roomResponse = roomMapper.toResponse(room);
-        List<SeatResponse> seatResponses = new ArrayList<>();
-        for(Seat seat : room.getSeats()) {
-            SeatResponse seatResponse = seatMapper.toResponse(seat);
-            seatResponses.add(seatResponse);
+    public List<RoomResponse> getRoomByCinema(String cinemaId) {
+        List<Room> rooms = roomRepository.getRoomByCinema(cinemaId);
+        List<RoomResponse> roomResponses = new ArrayList<>();
+        for(Room room : rooms) {
+            RoomResponse roomResponse = roomMapper.toResponse(room);
+            List<SeatResponse> seatResponses = new ArrayList<>();
+            for(Seat seat : room.getSeats()) {
+                SeatResponse seatResponse = seatMapper.toResponse(seat);
+                seatResponses.add(seatResponse);
+            }
+            roomResponse.setSeats(seatResponses);
+            roomResponses.add(roomResponse);
         }
-        roomResponse.setSeats(seatResponses);
-        return roomResponse;
-    }
-
-    @Override
-    public List<String> getRoomByCinema(String cinemaId) {
-        return roomRepository.getRoomByCinema(cinemaId);
+        return roomResponses;
     }
 }

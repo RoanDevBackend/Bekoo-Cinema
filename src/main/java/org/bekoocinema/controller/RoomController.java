@@ -23,9 +23,4 @@ public class RoomController {
     public ApiResponse getAllRoomByCinema(@PathVariable String cinemaId) {
         return ApiResponse.success(200, "Bạn đã lấy danh sách mã phòng chiếu", roomService.getRoomByCinema(cinemaId));
     }
-
-    @GetMapping("/public-api/room/{roomId}")
-    public ApiResponse getRoom(@PathVariable String roomId){
-        return ApiResponse.success(200, "", roomService.getRoomById(roomId));
-    }
 }

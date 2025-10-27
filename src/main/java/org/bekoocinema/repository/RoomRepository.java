@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, String> {
-    @Query("SELECT r.id " +
-            "FROM Room r " +
+    @Query("FROM Room r " +
             "WHERE r.cinema.id = :cinemaId ")
-    List<String> getRoomByCinema(String cinemaId);
+    List<Room> getRoomByCinema(String cinemaId);
 }
