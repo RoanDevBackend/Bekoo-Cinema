@@ -26,4 +26,7 @@ public class Cinema {
     //Mất điện, đang nâng cấp, sửa,..
     String status;
     // Nhớ thêm vào phần ảnh
+    public String getAddress() {
+        return this.district + " ," + this.commune + " ," + this.province;
+    }
 }

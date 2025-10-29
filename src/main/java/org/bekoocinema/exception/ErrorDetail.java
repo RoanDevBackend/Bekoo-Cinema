@@ -13,6 +13,8 @@ public enum ErrorDetail {
     , ERR_ORDER_USER_NOT_CORRECT(400, "Thao tác này chỉ được thực hiện với dữ liệu của bạn")
     , ERR_IMAGE_NOT_EXISTED(400, "Không tìm thấy thông tin ảnh")
     , ERR_CINEMA_NOT_EXISTED(400, "Rạp phim không tồn tại")
+    , ERR_ROOM_NOT_EXISTED(400, "Phòng chiếu không tồn tại")
+    , ERR_MOVIE_NOT_EXISTED(400, "Bộ phim không tồn tại")
     ;
 
     private final int code;
