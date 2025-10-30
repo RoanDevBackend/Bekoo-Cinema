@@ -1,5 +1,6 @@
 package org.bekoocinema.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bekoocinema.request.room.CreateShowtimeRequest;
@@ -21,5 +22,12 @@ public class ShowtimeController {
     @GetMapping("/public-api/showtime/{movieId}")
     public ApiResponse getShowtime(@PathVariable String movieId) {
         return ApiResponse.success(200, "Danh sách chiếu phim", showtimeService.getShowtime(movieId));
+    }
+
+    @PostMapping("/reset-seat/{showtimeId}")
+    @Operation(summary = "Khi phim chiếu xong, nhân viên sẽ dùng API này để xác nhận chiếu xong")
+    public ApiResponse resetSeat(@PathVariable String showtimeId) {
+        showtimeService.resetSeat(showtimeId);
+        return ApiResponse.success(200, "Thành công");
     }
 }

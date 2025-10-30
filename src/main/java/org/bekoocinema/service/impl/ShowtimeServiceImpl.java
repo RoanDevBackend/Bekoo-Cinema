@@ -8,10 +8,7 @@ import org.bekoocinema.exception.AppException;
 import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.mapper.RoomMapper;
 import org.bekoocinema.mapper.SeatMapper;
-import org.bekoocinema.repository.CinemaRepository;
-import org.bekoocinema.repository.MovieRepository;
-import org.bekoocinema.repository.RoomRepository;
-import org.bekoocinema.repository.ShowtimeRepository;
+import org.bekoocinema.repository.*;
 import org.bekoocinema.request.room.CreateShowtimeRequest;
 import org.bekoocinema.response.room.RoomResponse;
 import org.bekoocinema.response.room.SeatResponse;
@@ -22,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +30,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     final CinemaRepository cinemaRepository;
     final RoomMapper roomMapper;
     final SeatMapper seatMapper;
+    private final SeatRepository seatRepository;
 
     @Override
     @SneakyThrows
@@ -92,5 +87,19 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             showtimeResponses.add(showtimeResponse);
         }
         return showtimeResponses;
+    }
+
+    @Override
+    @Transactional
+    public void resetSeat(String showtimeId) {
+        Showtime showtime = showtimeRepository.findById(showtimeId)
+                .orElseThrow(
+                        () -> new RuntimeException("Xuất chiếu không tồn tại")
+                );
+        Set<Seat> seats = showtime.getRoom().getSeats();
+        for(Seat seat : seats){
+            seat.setBooked(false);
+        }
+        seatRepository.saveAll(seats);
     }
 }

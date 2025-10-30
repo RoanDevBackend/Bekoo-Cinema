@@ -8,5 +8,6 @@ import java.util.Map;
 
 public interface ShowtimeService {
     void newShowTime(CreateShowtimeRequest createRequest);
+    void resetSeat(String showtimeId);
     List<ShowtimeResponse> getShowtime(String movieId);
 }
