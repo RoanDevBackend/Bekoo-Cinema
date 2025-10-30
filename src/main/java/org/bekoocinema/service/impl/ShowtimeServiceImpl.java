@@ -82,7 +82,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                 List<SeatResponse> seatResponses = new ArrayList<>();
                 for(Seat seat : showtimeItem.getRoom().getSeats()) {
                     SeatResponse seatResponse = seatMapper.toResponse(seat);
-                    seatResponse.setAvailable(true);
                     seatResponses.add(seatResponse);
                 }
                 roomResponse.setSeats(seatResponses);

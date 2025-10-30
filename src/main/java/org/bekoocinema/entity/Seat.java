@@ -15,10 +15,12 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String seatName;
+    String seatType;
     int price;
     int colIdx;
     int rowIdx;
     String status;
+    boolean isBooked;
     @ManyToOne
     @JoinColumn(name = "room_id")
     Room room;

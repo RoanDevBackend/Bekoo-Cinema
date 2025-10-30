@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateSeatRequest {
     String seatName ;
+    String seatType ;
     int price;
     int rowIdx;
     int colIdx;

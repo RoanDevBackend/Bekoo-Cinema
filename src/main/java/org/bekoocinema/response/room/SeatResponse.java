@@ -11,9 +11,10 @@ import lombok.experimental.FieldDefaults;
 public class SeatResponse {
     String seatId;
     String seatName;
+    String seatType;
     int price;
     int rowIdx;
     int colIdx;
     String status;
-    boolean available;
+    boolean isBooked;
 }
