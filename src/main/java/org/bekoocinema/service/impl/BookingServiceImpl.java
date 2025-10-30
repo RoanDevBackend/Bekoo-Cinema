@@ -34,6 +34,9 @@ public class BookingServiceImpl implements BookingService {
         StringBuilder seatsName = new StringBuilder();
         List<Seat> seatsBooked = seatRepository.getSeatInId(bookingRequest.getSeatIds());
         for(Seat seat : seatsBooked) {
+            if(seat.isBooked()) {
+                throw new RuntimeException("Ghế " + seat.getSeatName() + " đã được đặt");
+            }
             totalPrice =  totalPrice + seat.getPrice();
             if(seatsName.toString().equals("")) {
                 seatsName = new StringBuilder(seat.getSeatName());
