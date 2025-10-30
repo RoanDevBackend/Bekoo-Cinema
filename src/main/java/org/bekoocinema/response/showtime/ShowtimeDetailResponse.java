@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShowtimeDetailResponse {
+    String id;
     String date;
     String timeline;
     RoomResponse roomResponse;

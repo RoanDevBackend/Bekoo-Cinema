@@ -72,6 +72,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             List<ShowtimeDetailResponse> showtimeDetailResponses = new ArrayList<>();
             for(Showtime showtimeItem : showtimes){
                 ShowtimeDetailResponse showtimeDetailResponse = new ShowtimeDetailResponse();
+                showtimeDetailResponse.setId(showtimeItem.getId());
                 String date = showtimeItem.getStartTime().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy:MM:dd"));
                 showtimeDetailResponse.setDate(date);
                 String startTime = showtimeItem.getStartTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"));
