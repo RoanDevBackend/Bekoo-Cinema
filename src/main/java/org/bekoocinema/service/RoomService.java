@@ -8,4 +8,5 @@ import java.util.List;
 public interface RoomService {
     void newRoom(CreateRoomRequest createRequest);
     List<RoomResponse> getRoomByCinema(String cinemaId);
+    RoomResponse getRoom(String id);
 }

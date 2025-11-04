@@ -29,4 +29,16 @@ public class CinemaController {
     public ApiResponse getCinemaByDistrict(@RequestParam(required = false, defaultValue = "") String keyWord) {
         return ApiResponse.success(200, "Tìm thành công", cinemaService.getCinema(keyWord));
     }
+
+    @Operation(summary = "Lấy chi tiết rạp chiếu")
+    @GetMapping(EndPointConstant.PUBLIC + "/cinema/{id}")
+    public ApiResponse getCinemaById(@PathVariable String id){
+        return ApiResponse.success(200, "Lấy rạp thành công", cinemaService.getCinemaById(id));
+    }
+
+    @Operation(summary = "Lấy danh sách tất cả rạp chiếu")
+    @GetMapping(EndPointConstant.PUBLIC + "/cinema/all")
+    public ApiResponse getAllCinemas() {
+        return ApiResponse.success(200, "Lấy danh sách rạp thành công", cinemaService.getAllCinemas());
+    }
 }

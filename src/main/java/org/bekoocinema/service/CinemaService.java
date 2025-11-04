@@ -8,4 +8,6 @@ import java.util.List;
 public interface CinemaService {
     void addCinema(CreateCinemaRequest createCinemaRequest);
     List<CinemaResponse> getCinema(String keyWord);
+    CinemaResponse getCinemaById(String id);
+    List<CinemaResponse> getAllCinemas();
 }

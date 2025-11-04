@@ -83,4 +83,20 @@ public class RoomServiceImpl implements RoomService {
         }
         return roomResponses;
     }
+
+    @Override
+    public RoomResponse getRoom(String id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+        
+        RoomResponse roomResponse = roomMapper.toResponse(room);
+        List<SeatResponse> seatResponses = new ArrayList<>();
+        for(Seat seat : room.getSeats()) {
+            SeatResponse seatResponse = seatMapper.toResponse(seat);
+            seatResponses.add(seatResponse);
+        }
+        roomResponse.setSeats(seatResponses);
+        
+        return roomResponse;
+    }
 }

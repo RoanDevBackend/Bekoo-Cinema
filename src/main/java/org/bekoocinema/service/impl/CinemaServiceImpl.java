@@ -60,6 +60,31 @@ public class CinemaServiceImpl implements CinemaService {
         return cinemaResponses;
     }
 
+    @Override
+    public CinemaResponse getCinemaById(String id) {
+        Cinema cinema = cinemaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cinema not found"));
+        
+        CinemaResponse cinemaResponse = cinemaMapper.toCinemaResponse(cinema);
+        List<String> urlsCinema = imageRepository.getUrlByTargetId("cinema", cinema.getId());
+        cinemaResponse.setUrlImages(urlsCinema);
+        
+        return cinemaResponse;
+    }
+
+    @Override
+    public List<CinemaResponse> getAllCinemas() {
+        List<Cinema> cinemas = cinemaRepository.findAll();
+        List<CinemaResponse> responses = new ArrayList<>();
+        for (Cinema cinema : cinemas) {
+            CinemaResponse cinemaResponse = cinemaMapper.toCinemaResponse(cinema);
+            List<String> urlsCinema = imageRepository.getUrlByTargetId("cinema", cinema.getId());
+            cinemaResponse.setUrlImages(urlsCinema);
+            responses.add(cinemaResponse);
+        }
+        return responses;
+    }
+
     private String getFileUrl(MultipartFile file) throws IOException {
         try {
             if(file == null || file.isEmpty()){
