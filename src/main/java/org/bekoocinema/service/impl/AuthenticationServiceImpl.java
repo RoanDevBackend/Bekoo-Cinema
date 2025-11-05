@@ -34,6 +34,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final SpringTemplateEngine templateEngine;
     final MailService mailService;
     final RedisRepository redisRepository;
+    final PasswordEncoder passwordEncoder;
 
     @Override
     @SneakyThrows
@@ -76,6 +77,56 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .expToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN))
                 .expRefreshToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN * 2))
                 .build();
+    }
+
+    @Override
+    @SneakyThrows
+    public TokenResponse getOtpForgotPassword(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AppException(ErrorDetail.ERR_USER_NOT_EXISTED);
+        }
+        this.getOtp(user.getEmail());
+        final long TIME_TOKEN = 1000L * 60 * 2;
+        var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
+
+        return TokenResponse.builder()
+                .tokenContent(tokenContent)
+                .expToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN))
+                .build();
+    }
+
+    @Override
+    public TokenResponse verifyOtpForgotPassword(String OTP, User user) {
+        this.verifyOtp(user.getEmail(), OTP);
+
+        final long TIME_TOKEN = 1000L * 60 * 60 * 24;
+        var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
+        var refreshToken = jwtService.generateToken(user, TIME_TOKEN * 7);
+
+        return TokenResponse.builder()
+                .tokenContent(tokenContent)
+                .refreshToken(refreshToken)
+                .userId(user.getId())
+                .userName(user.getEmail())
+                .roleName(user.getRole())
+                .expToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN))
+                .expRefreshToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN * 2))
+                .build();
+    }
+
+    @Override
+    public void changePasswordNoAuth(String newPassword, User user) throws AppException {
+        Object verified = redisRepository.get(user.getEmail());
+        if (verified == null || !"verified".equals(verified.toString())) {
+            throw new AppException(ErrorDetail.ERR_USER_SESSION_EXPIRED);
+            
+        }
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        
+        redisRepository.delete(user.getEmail());
     }
 
     private void getOtp(String mail) throws AppException, MessagingException, UnsupportedEncodingException {
