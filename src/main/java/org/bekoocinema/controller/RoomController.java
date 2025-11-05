@@ -25,6 +25,11 @@ public class RoomController {
         return ApiResponse.success(200, "Bạn đã lấy danh sách mã phòng chiếu", roomService.getRoomByCinema(cinemaId));
     }
 
+    @GetMapping("/public-api/room/cinema/{cinemaId}/simple")
+    public ApiResponse getAllRoomByCinemaSimple(@PathVariable String cinemaId) {
+        return ApiResponse.success(200, "Bạn đã lấy danh sách mã và tên phòng chiếu", roomService.getRoomByCinemaSimple(cinemaId));
+    }
+
     @Operation(summary = "Lấy chi tiết phòng chiếu")
     @GetMapping("/public-api/room/{roomId}")
     public ApiResponse getRoomById(@PathVariable String roomId) {

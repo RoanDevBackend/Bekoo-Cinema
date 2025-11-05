@@ -16,6 +16,7 @@ import org.bekoocinema.repository.SeatRepository;
 import org.bekoocinema.request.room.CreateRoomRequest;
 import org.bekoocinema.request.room.CreateSeatRequest;
 import org.bekoocinema.response.room.RoomResponse;
+import org.bekoocinema.response.room.RoomSimpleResponse;
 import org.bekoocinema.response.room.SeatResponse;
 import org.bekoocinema.service.RoomService;
 import org.springframework.stereotype.Service;
@@ -82,6 +83,12 @@ public class RoomServiceImpl implements RoomService {
             roomResponses.add(roomResponse);
         }
         return roomResponses;
+    }
+
+    //chỉ trả về id và tên
+    @Override
+    public List<RoomSimpleResponse> getRoomByCinemaSimple(String cinemaId) {
+        return roomRepository.getRoomByCinemaSimple(cinemaId);
     }
 
     @Override
