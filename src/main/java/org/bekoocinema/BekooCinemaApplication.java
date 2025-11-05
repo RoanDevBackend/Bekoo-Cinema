@@ -3,6 +3,7 @@ package org.bekoocinema;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.bekoocinema.entity.User;
 import org.bekoocinema.mapper.UserMapper;
 import org.bekoocinema.repository.UserRepository;
@@ -15,12 +16,24 @@ import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestCli
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.core.env.Environment;
+
+@Log4j2
 @SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class})
 @RequiredArgsConstructor
 public class BekooCinemaApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(BekooCinemaApplication.class, args);
+        Environment env = SpringApplication.run(BekooCinemaApplication.class, args).getEnvironment();
+        String appName = env.getProperty("spring.application.name");
+        if (appName != null) {
+            appName = appName.toUpperCase();
+        }
+        String url = env.getProperty("spring.url");
+        log.info("-------------------------START {} Application------------------------------", appName);
+        log.info("   Application         : {}", appName);
+        log.info("   Url swagger-ui      : {}/swagger-ui.html", url);
+        log.info("-------------------------START SUCCESS {} Application------------------------------", appName);
     }
 
     final UserRepository userRepository;
