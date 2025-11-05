@@ -38,7 +38,9 @@ public class CinemaController {
 
     @Operation(summary = "Lấy danh sách tất cả rạp chiếu")
     @GetMapping(EndPointConstant.PUBLIC + "/cinema/all")
-    public ApiResponse getAllCinemas() {
-        return ApiResponse.success(200, "Lấy danh sách rạp thành công", cinemaService.getAllCinemas());
+    public ApiResponse getAllCinemas(
+            @RequestParam(required = false, defaultValue = "1") int pageIndex,
+            @RequestParam(required = false, defaultValue = "10") int pageSize) {
+        return ApiResponse.success(200, "Lấy danh sách rạp thành công", cinemaService.getAllCinemas(pageIndex, pageSize));
     }
 }

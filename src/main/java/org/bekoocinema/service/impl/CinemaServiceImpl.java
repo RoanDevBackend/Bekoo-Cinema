@@ -10,8 +10,12 @@ import org.bekoocinema.mapper.CinemaMapper;
 import org.bekoocinema.repository.CinemaRepository;
 import org.bekoocinema.repository.ImageRepository;
 import org.bekoocinema.request.cinema.CreateCinemaRequest;
+import org.bekoocinema.response.PageResponse;
 import org.bekoocinema.response.cinema.CinemaResponse;
 import org.bekoocinema.service.CinemaService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,16 +77,33 @@ public class CinemaServiceImpl implements CinemaService {
     }
 
     @Override
-    public List<CinemaResponse> getAllCinemas() {
-        List<Cinema> cinemas = cinemaRepository.findAll();
+    public PageResponse<?> getAllCinemas(int pageIndex, int pageSize) {
+        this.validPage(pageIndex, pageSize);
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        Page<Cinema> cinemaPage = cinemaRepository.findAllCinemas(pageable);
+        
         List<CinemaResponse> responses = new ArrayList<>();
-        for (Cinema cinema : cinemas) {
+        for (Cinema cinema : cinemaPage.getContent()) {
             CinemaResponse cinemaResponse = cinemaMapper.toCinemaResponse(cinema);
             List<String> urlsCinema = imageRepository.getUrlByTargetId("cinema", cinema.getId());
             cinemaResponse.setUrlImages(urlsCinema);
             responses.add(cinemaResponse);
         }
-        return responses;
+        
+        return PageResponse.<CinemaResponse>builder()
+                .pageIndex(pageIndex)
+                .pageSize(pageSize)
+                .sortBy(new PageResponse.SortBy("name", "asc"))
+                .content(responses)
+                .totalElements(cinemaPage.getTotalElements())
+                .totalPages(cinemaPage.getTotalPages())
+                .build();
+    }
+
+    private void validPage(int pageIndex, int pageSize){
+        if(pageIndex < 1 || pageSize < 1){
+            throw new IllegalArgumentException("Số trang và số phần tử trong một trang cần lớn hơn 1");
+        }
     }
 
     private String getFileUrl(MultipartFile file) throws IOException {
