@@ -16,6 +16,7 @@ import org.bekoocinema.repository.SeatRepository;
 import org.bekoocinema.request.room.CreateRoomRequest;
 import org.bekoocinema.request.room.CreateSeatRequest;
 import org.bekoocinema.response.room.RoomResponse;
+import org.bekoocinema.response.room.RoomSimpleResponse;
 import org.bekoocinema.response.room.SeatResponse;
 import org.bekoocinema.service.RoomService;
 import org.springframework.stereotype.Service;
@@ -82,5 +83,27 @@ public class RoomServiceImpl implements RoomService {
             roomResponses.add(roomResponse);
         }
         return roomResponses;
+    }
+
+    //chỉ trả về id và tên
+    @Override
+    public List<RoomSimpleResponse> getRoomByCinemaSimple(String cinemaId) {
+        return roomRepository.getRoomByCinemaSimple(cinemaId);
+    }
+
+    @Override
+    public RoomResponse getRoom(String id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+        
+        RoomResponse roomResponse = roomMapper.toResponse(room);
+        List<SeatResponse> seatResponses = new ArrayList<>();
+        for(Seat seat : room.getSeats()) {
+            SeatResponse seatResponse = seatMapper.toResponse(seat);
+            seatResponses.add(seatResponse);
+        }
+        roomResponse.setSeats(seatResponses);
+        
+        return roomResponse;
     }
 }
