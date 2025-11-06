@@ -49,4 +49,10 @@ public class MovieController {
     public ApiResponse getMovieById(@PathVariable String id) {
         return ApiResponse.success(200, "Thành công", movieService.getMovieById(id));
     }
+
+    @GetMapping(EndPointConstant.PUBLIC + "/movie/by-date/{date}")
+    public ApiResponse getMovieByDate(@PathVariable String date) {
+        return ApiResponse.success(200, "Lấy các phim chiếu theo ngày thành công", movieService.getMovieByDate(date));
+    }
+
 }
