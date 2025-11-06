@@ -1,8 +1,10 @@
 package org.bekoocinema.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bekoocinema.exception.AppException;
 import org.bekoocinema.request.room.CreateShowtimeRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.ShowtimeService;
@@ -13,8 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class ShowtimeController {
     final ShowtimeService showtimeService;
 
+    @Operation(summary = "Api dùng để tạo xuất chiếu", security = {
+            @SecurityRequirement(name = "bearerAuth")
+    })
     @PostMapping("/showtime")
-    public ApiResponse newShowtime(@RequestBody @Valid CreateShowtimeRequest createShowtimeRequest) {
+    public ApiResponse newShowtime(@RequestBody @Valid CreateShowtimeRequest createShowtimeRequest) throws AppException {
         showtimeService.newShowTime(createShowtimeRequest);
         return ApiResponse.success(201, "Thêm thành công");
     }
