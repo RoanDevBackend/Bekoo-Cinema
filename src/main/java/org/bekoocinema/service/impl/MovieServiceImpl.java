@@ -132,7 +132,7 @@ public class MovieServiceImpl implements MovieService {
     public PageResponse<?> getUpcomingMovie(int pageIndex, int pageSize) {
 
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime fiveHoursLater = now.plusHours(5);
+    LocalDateTime fiveHoursLater = now.plusHours(24);
     Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
 
     Page<Movie> upcomingMovies = movieRepository.findUpcomingMovies(now, fiveHoursLater, pageable);
