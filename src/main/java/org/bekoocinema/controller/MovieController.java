@@ -44,6 +44,12 @@ public class MovieController {
                                      @RequestParam(required = false, defaultValue = "asc") String sortDirection) {
         return ApiResponse.success(200, "Thành công", movieService.filterMovie(searchName, genre, minPrice, maxPrice, pageIndex, pageSize, orderType, sortDirection));
     }
+
+    @GetMapping(EndPointConstant.PUBLIC + "/movie/{id}")
+    public ApiResponse getMovieById(@PathVariable String id) {
+        return ApiResponse.success(200, "Thành công", movieService.getMovieById(id));
+    }
+
     @GetMapping(EndPointConstant.PUBLIC + "/movie/showing")
     public ApiResponse getMovieShowing(
             @RequestParam(required = false, defaultValue = "1") int pageIndex,

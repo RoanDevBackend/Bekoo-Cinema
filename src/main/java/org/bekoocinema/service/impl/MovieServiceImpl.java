@@ -147,6 +147,14 @@ public class MovieServiceImpl implements MovieService {
                 .build();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public MovieResponse getMovieById(String id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim"));
+        return movieMapper.toMovieResponse(movie);
+    }
+
 
     private String getOrderBy(String orderType){
         return switch (orderType) {
