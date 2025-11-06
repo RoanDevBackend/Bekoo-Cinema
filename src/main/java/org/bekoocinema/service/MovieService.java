@@ -7,5 +7,7 @@ import org.bekoocinema.response.movie.MovieResponse;
 public interface MovieService {
     void addMovie(CreateMovieRequest createMovieRequest);
     PageResponse<?> filterMovie(String searchName, String genre, int minPrice, int maxPrice, int pageIndex, int pageSize, String orderType, String sortDirection);
+    PageResponse<?> getMovieShowing(int pageIndex, int pageSize);
+    PageResponse<?> getUpcomingMovie(int pageIndex, int pageSize);
     MovieResponse getMovieById(String id);
 }
