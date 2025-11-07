@@ -55,4 +55,20 @@ public class MovieController {
         return ApiResponse.success(200, "Lấy các phim chiếu theo ngày thành công", movieService.getMovieByDate(date));
     }
 
+
+    @GetMapping(EndPointConstant.PUBLIC + "/movie/showing")
+    public ApiResponse getMovieShowing(
+            @RequestParam(required = false, defaultValue = "1") int pageIndex,
+            @RequestParam(required = false, defaultValue = "40") int pageSize
+    ){
+        return ApiResponse.success(200, "Thành công", movieService.getMovieShowing(pageIndex, pageSize));
+    }
+
+    @GetMapping(EndPointConstant.PUBLIC + "/movie/upcoming")
+    public ApiResponse getUpcomingMovies(
+            @RequestParam(required = false, defaultValue = "1") int pageIndex,
+            @RequestParam(required = false, defaultValue = "40") int pageSize
+    ){
+        return ApiResponse.success(200, "Thành công", movieService.getUpcomingMovie(pageIndex, pageSize));
+    }
 }
