@@ -85,13 +85,13 @@ public class RoomServiceImpl implements RoomService {
         return roomResponses;
     }
 
-    //chỉ trả về id và tên
     @Override
     public List<RoomSimpleResponse> getRoomByCinemaSimple(String cinemaId) {
         return roomRepository.getRoomByCinemaSimple(cinemaId);
     }
 
     @Override
+    @Transactional()
     public RoomResponse getRoom(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));

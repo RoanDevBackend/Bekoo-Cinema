@@ -2,6 +2,7 @@ package org.bekoocinema.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bekoocinema.constant.EndPointConstant;
@@ -16,6 +17,9 @@ public class CinemaController {
 
     final CinemaService cinemaService;
 
+    @Operation(summary = "Api dùng để tạo phim", security = {
+            @SecurityRequirement(name = "bearerAuth")
+    })
     @PostMapping("/cinema")
     public ApiResponse createCinema(@ModelAttribute @Valid CreateCinemaRequest createCinemaRequest) {
         cinemaService.addCinema(createCinemaRequest);
