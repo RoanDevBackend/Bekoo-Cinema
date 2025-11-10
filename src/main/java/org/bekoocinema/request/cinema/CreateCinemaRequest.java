@@ -16,11 +16,10 @@ import java.util.List;
 public class CreateCinemaRequest {
     @NotBlank(message = "Tên không được bỏ trống")
     String name;
-    @NotBlank(message = "Địa chỉ không được bỏ trống")
+    @NotBlank(message = "Địa chỉ tỉnh không được bỏ trống")
     String province;
-    @NotBlank(message = "Địa chỉ không được bỏ trống")
     String district;
-    @NotBlank(message = "Địa chỉ không được bỏ trống")
+    @NotBlank(message = "Địa chỉ xã không được bỏ trống")
     String commune;
     String detailAddress;
     @NotBlank(message = "Số điện thoại không được bỏ trống")
