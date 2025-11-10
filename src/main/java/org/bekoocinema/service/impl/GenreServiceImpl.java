@@ -1,8 +1,10 @@
 package org.bekoocinema.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bekoocinema.entity.Genre;
+import org.bekoocinema.entity.Movie;
 import org.bekoocinema.exception.AppException;
 import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.repository.GenreRepository;
@@ -31,8 +33,17 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @SneakyThrows
+    @Transactional
     public void deleteGenre(String genreId) {
-        genreRepository.deleteById(genreId);
+        Genre genre = genreRepository.findById(genreId).orElseThrow(
+                () -> new AppException(ErrorDetail.ERR_GENRE_NOT_EXISTED)
+        );
+        for (Movie movie : genre.getMovies()) {
+            movie.getGenres().remove(genre);
+        }
+        genre.getMovies().clear();
+        genreRepository.delete(genre);
     }
 
     @Override

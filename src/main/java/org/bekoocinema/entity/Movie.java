@@ -49,7 +49,6 @@ public class Movie extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     @IndexedEmbedded(includePaths = {"id", "name"})
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Set<Genre> genres = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
