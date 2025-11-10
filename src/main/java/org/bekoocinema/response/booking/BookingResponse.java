@@ -16,11 +16,10 @@ public class BookingResponse {
     String movieName;
     String movieId;
     String genreName;
-    String seats;
+    String seatNames;
     String roomName;
     String cinemaName;
     String cinemaAddress;
-    String paymentMethod;
     String paymentStatus;
     LocalDateTime paymentDate;
     LocalDateTime checkInDate;

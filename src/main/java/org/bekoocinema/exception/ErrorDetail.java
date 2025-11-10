@@ -18,6 +18,8 @@ public enum ErrorDetail {
     , ERR_ROOM_NOT_EXISTED(400, "Phòng chiếu không tồn tại")
     , ERR_MOVIE_NOT_EXISTED(400, "Bộ phim không tồn tại")
     , ERR_SHOWTIME_CONFLICT(409, "Phòng chiếu đã có lịch chiếu khác trong khung giờ này")
+    , ERR_BOOKING_NOT_EXISTED(404, "Mã vé đặt không tồn tại")
+    , ERR_ORDER_TIME_VALID(400, "Đơn hàng đã qúa thời gian thanh toán")
     ;
 
     private final int code;

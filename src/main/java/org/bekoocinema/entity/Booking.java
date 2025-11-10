@@ -23,11 +23,11 @@ public class Booking {
     String movieName;
     String movieId;
     String genreName;
-    String seats;
+    String seatNames;
+    String seatIds;
     String roomName;
     String cinemaName;
     String cinemaAddress;
-    String paymentMethod;
     String paymentStatus;
     LocalDateTime paymentDate;
     LocalDateTime checkInDate;

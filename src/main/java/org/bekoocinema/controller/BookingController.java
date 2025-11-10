@@ -1,5 +1,6 @@
 package org.bekoocinema.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bekoocinema.entity.User;
@@ -18,9 +19,8 @@ public class BookingController {
     final BookingService bookingService;
 
     @PostMapping("/booking")
-    public ApiResponse booking(@RequestBody @Valid BookingRequest bookingRequest, @AuthenticationPrincipal User user) {
-        bookingService.booking(bookingRequest, user);
-        return ApiResponse.success(201, "Đặt thành công");
+    public ApiResponse booking(@RequestBody @Valid BookingRequest bookingRequest, @AuthenticationPrincipal User user, HttpServletRequest request) {
+        return ApiResponse.success(200, "Hãy thanh toán", bookingService.booking(bookingRequest, user, request));
     }
 
     @GetMapping("/booking")

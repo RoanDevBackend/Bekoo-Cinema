@@ -13,5 +13,4 @@ import java.util.List;
 public class BookingRequest {
     String showtimeId;
     List<String> seatIds;
-    int paymentMethod;
 }

@@ -34,6 +34,7 @@ public class WebSecurity {
             , "/swagger-ui/**"
             , "/swagger-ui.html"
             , "/forgot-password"
+            , "/payment-result"
             , EndPointConstant.PUBLIC + "/**"
     };
 
