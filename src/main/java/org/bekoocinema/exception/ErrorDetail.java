@@ -17,6 +17,7 @@ public enum ErrorDetail {
     , ERR_CINEMA_NOT_EXISTED(400, "Rạp phim không tồn tại")
     , ERR_ROOM_NOT_EXISTED(400, "Phòng chiếu không tồn tại")
     , ERR_MOVIE_NOT_EXISTED(400, "Bộ phim không tồn tại")
+    , ERR_SHOWTIME_CONFLICT(409, "Phòng chiếu đã có lịch chiếu khác trong khung giờ này")
     ;
 
     private final int code;

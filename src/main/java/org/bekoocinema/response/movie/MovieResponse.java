@@ -2,6 +2,7 @@ package org.bekoocinema.response.movie;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.bekoocinema.response.showtime.ShowtimeDetailResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,4 +27,5 @@ public class MovieResponse {
     String trailerUrl;
     String posterUrl;
     List<String> genres;
+    List<ShowtimeDetailResponse> showtimeDetailResponses;
 }

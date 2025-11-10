@@ -33,19 +33,31 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     private final SeatRepository seatRepository;
 
     @Override
-    @SneakyThrows
-    public void newShowTime(CreateShowtimeRequest createRequest) {
+    public void newShowTime(CreateShowtimeRequest createRequest) throws AppException {
         Room room = roomRepository.findById(createRequest.getRoomId()).orElseThrow(
                 () -> new AppException(ErrorDetail.ERR_ROOM_NOT_EXISTED)
         );
         Movie movie = movieRepository.findById(createRequest.getMovieId()).orElseThrow(
                 () -> new AppException(ErrorDetail.ERR_MOVIE_NOT_EXISTED)
         );
+        
+        LocalDateTime startTime = LocalDateTime.parse(createRequest.getStartTime());
+        LocalDateTime endTime = LocalDateTime.parse(createRequest.getEndTime());
+        
+        boolean hasConflict = showtimeRepository.existsConflictingShowtime(
+                createRequest.getRoomId(),
+                startTime,
+                endTime
+        );
+        
+        if (hasConflict) {
+            throw new AppException(ErrorDetail.ERR_SHOWTIME_CONFLICT);
+        }
         Showtime showtime = new Showtime();
         showtime.setRoom(room);
         showtime.setMovie(movie);
-        showtime.setStartTime(LocalDateTime.parse(createRequest.getStartTime()));
-        showtime.setEndTime(LocalDateTime.parse(createRequest.getEndTime()));
+        showtime.setStartTime(startTime);
+        showtime.setEndTime(endTime);
         showtimeRepository.save(showtime);
     }
 
@@ -72,7 +84,8 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                 showtimeDetailResponse.setDate(date);
                 String startTime = showtimeItem.getStartTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"));
                 String endTime = showtimeItem.getEndTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"));
-                showtimeDetailResponse.setTimeline(startTime + "-" + endTime);
+                showtimeDetailResponse.setStartTime(startTime);
+                showtimeDetailResponse.setEndTime(endTime);
                 RoomResponse roomResponse = roomMapper.toResponse(showtimeItem.getRoom());
                 List<SeatResponse> seatResponses = new ArrayList<>();
                 for(Seat seat : showtimeItem.getRoom().getSeats()) {

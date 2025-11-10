@@ -16,6 +16,7 @@ import java.util.List;
 public class ShowtimeDetailResponse {
     String id;
     String date;
-    String timeline;
+    String startTime;
+    String endTime;
     RoomResponse roomResponse;
 }

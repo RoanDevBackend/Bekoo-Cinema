@@ -17,6 +17,7 @@ import org.bekoocinema.service.MovieService;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -153,6 +160,23 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim"));
         return movieMapper.toMovieResponse(movie);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MovieResponse> getMovieByDate(String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        LocalDateTime startOfDay = localDate.atStartOfDay();
+        LocalDateTime endOfDay = localDate.atTime(23, 59, 59);
+
+        List<Movie> movies = movieRepository.getMovieByDate(startOfDay, endOfDay);
+        if (movies.isEmpty()) {
+            throw new DataAccessResourceFailureException("Không có phim nào trong ngày này");
+        }
+
+        return movies.stream()
+                .map(movieMapper::toMovieResponse)
+                .toList();
     }
 
 
