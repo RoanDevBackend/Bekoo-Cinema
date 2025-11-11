@@ -35,6 +35,7 @@ public class WebSecurity {
             , "/swagger-ui.html"
             , "/forgot-password"
             , "/payment-result"
+            , "/socket/seat/**"
             , EndPointConstant.PUBLIC + "/**"
     };
 
