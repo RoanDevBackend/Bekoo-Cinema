@@ -1,5 +1,6 @@
 package org.bekoocinema.service.impl;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -10,6 +11,7 @@ import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.repository.GenreRepository;
 import org.bekoocinema.response.GenreResponse.GenreResponse;
 import org.bekoocinema.service.GenreService;
+import org.hibernate.search.mapper.orm.Search;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
 public class GenreServiceImpl implements GenreService {
 
     final GenreRepository genreRepository;
+    final EntityManager entityManager;
 
     @SneakyThrows
     @Override
@@ -30,6 +33,25 @@ public class GenreServiceImpl implements GenreService {
         Genre genre = new Genre();
         genre.setName(genreName);
         genreRepository.save(genre);
+    }
+
+    @Override
+    @SneakyThrows
+    @Transactional
+    public void updateGenre(String genreId, String newName) {
+        Genre genre = genreRepository.findById(genreId)
+            .orElseThrow(() -> new AppException(ErrorDetail.ERR_GENRE_NOT_EXISTED));
+
+        if(genreRepository.existsByName(newName) && !genre.getName().equals(newName)) {
+            throw new AppException(ErrorDetail.ERR_GENRE_EXISTED);
+        }
+
+        genre.setName(newName);
+        genreRepository.save(genre);
+
+        for (Movie movie : genre.getMovies()) {
+            Search.session(entityManager).indexingPlan().addOrUpdate(movie);
+        }
     }
 
     @Override
