@@ -1,22 +1,30 @@
 package org.bekoocinema.service.impl;
 
 import com.cloudinary.Cloudinary;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bekoocinema.entity.Cinema;
+import org.bekoocinema.entity.Genre;
 import org.bekoocinema.entity.Image;
 import org.bekoocinema.entity.Room;
 import org.bekoocinema.exception.AppException;
 import org.bekoocinema.exception.ErrorDetail;
+import org.bekoocinema.entity.Showtime;
 import org.bekoocinema.mapper.CinemaMapper;
 import org.bekoocinema.repository.CinemaRepository;
 import org.bekoocinema.repository.ImageRepository;
 import org.bekoocinema.repository.RoomRepository;
+import org.bekoocinema.repository.ShowtimeRepository;
 import org.bekoocinema.request.cinema.CreateCinemaRequest;
 import org.bekoocinema.request.cinema.UpdateCinemaRequest;
 import org.bekoocinema.response.PageResponse;
-import org.bekoocinema.response.cinema.CinemaResponse;
+import org.bekoocinema.response.cinema.*;
 import org.bekoocinema.service.CinemaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +48,7 @@ public class CinemaServiceImpl implements CinemaService {
     final ImageRepository imageRepository;
     final CinemaMapper cinemaMapper;
     final RoomRepository roomRepository;
+    final ShowtimeRepository showtimeRepository;
 
     @Override
     @SneakyThrows
@@ -196,6 +205,100 @@ public class CinemaServiceImpl implements CinemaService {
         cinemaRepository.delete(cinema);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public CinemaMovieScheduleResponse getMovieSchedule(String cinemaId, String startDate) {
+        Cinema cinema = cinemaRepository.findById(cinemaId)
+            .orElseThrow(() -> new RuntimeException("Rạp chiếu không tồn tại"));
+
+        LocalDate start = startDate != null && !startDate.isBlank()
+            ? LocalDate.parse(startDate)
+            : LocalDate.now();
+        LocalDate end = start.plusDays(7);
+
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(23, 59, 59);
+
+        List<Showtime> showtimes = showtimeRepository.findByCinemaAndDateRange(cinemaId, startDateTime, endDateTime);
+
+        Map<LocalDate, List<Showtime>> showtimesByDate = showtimes
+            .stream()
+            .collect(Collectors.groupingBy(st -> st.getStartTime().toLocalDate()));
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        List<CinemaDateScheduleResponse> dates = new ArrayList<>();
+
+        for(LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
+            List<Showtime> dayShowtimes = showtimesByDate.getOrDefault(date, new ArrayList<>());
+
+            if (dayShowtimes.isEmpty()) {
+                continue;
+            }
+
+            Map<String, List<Showtime>> showtimesByMovie = dayShowtimes
+                .stream()
+                .collect(Collectors.groupingBy(st -> st.getMovie().getId()));
+
+            List<CinemaMovieItemResponse> movies = new ArrayList<>();
+
+            for(Map.Entry<String, List<Showtime>> entry : showtimesByMovie.entrySet()) {
+                List<Showtime> movieShowtimes = entry.getValue();
+                if (movieShowtimes.isEmpty()) continue;
+
+                Showtime firstShowtime = movieShowtimes.get(0);
+
+                CinemaMovieItemResponse movieResponse = new CinemaMovieItemResponse();
+                movieResponse.setMovieId(firstShowtime.getMovie().getId());
+                movieResponse.setMovieName(firstShowtime.getMovie().getName());
+                movieResponse.setPosterUrl(firstShowtime.getMovie().getPosterUrl());
+                movieResponse.setDuration(firstShowtime.getMovie().getDuration());
+
+                List<String> genres = firstShowtime
+                    .getMovie()
+                    .getGenres()
+                    .stream()
+                    .map(Genre::getName)
+                    .collect(Collectors.toList());
+                movieResponse.setGenres(genres);
+
+                List<CinemaShowtimeItemResponse> showtimeItems = movieShowtimes
+                    .stream()
+                    .sorted(Comparator.comparing(Showtime::getStartTime))
+                    .map(st -> {
+                        CinemaShowtimeItemResponse item = new CinemaShowtimeItemResponse();
+                        item.setShowtimeId(st.getId());
+                        item.setStartTime(st
+                                .getStartTime()
+                                .toLocalTime()
+                                .format(timeFormatter));
+                        item.setEndTime(st.getEndTime().toLocalTime().format(timeFormatter));
+                        item.setRoomName(st.getRoom().getName());
+                        return item;
+                    })
+                    .collect(Collectors.toList());
+
+                movieResponse.setShowtimes(showtimeItems);
+                movies.add(movieResponse);
+            }
+
+            movies.sort(Comparator.comparing(CinemaMovieItemResponse::getMovieName));
+
+            CinemaDateScheduleResponse dateSchedule = new CinemaDateScheduleResponse();
+            dateSchedule.setDate(date.format(dateFormatter));
+            dateSchedule.setMovies(movies);
+            dates.add(dateSchedule);
+        }
+
+        CinemaMovieScheduleResponse response = new CinemaMovieScheduleResponse();
+        response.setCinemaId(cinema.getId());
+        response.setCinemaName(cinema.getName());
+        response.setAddress(cinema.getAddress());
+        response.setDates(dates);
+
+        return response;
+    }
 
     private String getFileUrl(MultipartFile file) throws IOException {
         try {

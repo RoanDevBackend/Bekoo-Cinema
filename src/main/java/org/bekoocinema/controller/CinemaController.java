@@ -74,4 +74,21 @@ public class CinemaController {
         cinemaService.deleteCinema(id);
         return ApiResponse.success(200, "Xóa rạp thành công");
     }
+
+    @Operation(
+            summary = "Lấy danh sách phim chiếu theo rạp (phân theo ngày trong 1 tuần)",
+            parameters = {
+                    @Parameter(name = "cinemaId", description = "ID của rạp chiếu", required = true),
+                    @Parameter(name = "startDate",
+                            description = "Ngày bắt đầu (format: yyyy-MM-dd), mặc định là hôm nay"),
+            }
+    )
+    @GetMapping(EndPointConstant.PUBLIC + "/cinema/{cinemaId}/movies")
+    public ApiResponse getMovieSchedule(@PathVariable String cinemaId, @RequestParam(required = false) String startDate) {
+        return ApiResponse.success(200, "Lấy lịch chiếu phim theo rạp thành công",
+                cinemaService.getMovieSchedule(cinemaId, startDate)
+        );
+    }
+
+
 }

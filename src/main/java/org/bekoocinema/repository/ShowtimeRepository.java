@@ -22,4 +22,21 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
     );
+
+    @Query(
+        "SELECT DISTINCT st FROM Showtime st " +
+            "LEFT JOIN FETCH st.movie m " +
+            "LEFT JOIN FETCH m.genres " +
+            "LEFT JOIN FETCH st.room r " +
+            "LEFT JOIN FETCH r.cinema " +
+            "WHERE r.cinema.id = :cinemaId " +
+            "AND st.startTime >= :startDateTime " +
+            "AND st.startTime <= :endDateTime " +
+            "ORDER BY st.startTime ASC"
+    )
+    List<Showtime> findByCinemaAndDateRange(
+        @Param("cinemaId") String cinemaId,
+        @Param("startDateTime") LocalDateTime startDateTime,
+        @Param("endDateTime") LocalDateTime endDateTime
+    );
 }
