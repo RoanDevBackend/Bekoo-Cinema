@@ -1,9 +1,12 @@
 package org.bekoocinema.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.room.CreateRoomRequest;
+import org.bekoocinema.request.room.UpdateRoomRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.RoomService;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,30 @@ public class RoomController {
     public ApiResponse createRoom(@RequestBody @Valid CreateRoomRequest createRoomRequest) {
         roomService.newRoom(createRoomRequest);
         return ApiResponse.success(201, "Thêm thành công");
+    }
+
+    @Operation(
+        summary = "Cập nhật phòng chiếu",
+        security = {
+                @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @PutMapping(EndPointConstant.PUBLIC + "/room/{roomId}")
+    public ApiResponse updateRoom(@PathVariable String roomId, @RequestBody @Valid UpdateRoomRequest updateRoomRequest) {
+        roomService.updateRoom(roomId, updateRoomRequest);
+        return ApiResponse.success(200, "Cập nhật phòng chiếu thành công");
+    }
+
+    @Operation(
+        summary = "Xóa phòng chiếu",
+        security = {
+                @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @DeleteMapping(EndPointConstant.PUBLIC + "/room/{roomId}")
+    public ApiResponse deleteRoom(@PathVariable String roomId) {
+        roomService.deleteRoom(roomId);
+        return ApiResponse.success(200, "Xóa phòng chiếu thành công");
     }
 
     @GetMapping("/public-api/room/cinema/{cinemaId}")

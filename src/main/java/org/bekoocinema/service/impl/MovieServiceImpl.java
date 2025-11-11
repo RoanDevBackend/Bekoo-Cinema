@@ -7,10 +7,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bekoocinema.entity.Genre;
 import org.bekoocinema.entity.Movie;
+import org.bekoocinema.exception.AppException;
+import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.mapper.MovieMapper;
 import org.bekoocinema.repository.GenreRepository;
 import org.bekoocinema.repository.MovieRepository;
 import org.bekoocinema.request.movie.CreateMovieRequest;
+import org.bekoocinema.request.movie.UpdateMovieRequest;
 import org.bekoocinema.response.PageResponse;
 import org.bekoocinema.response.movie.MovieResponse;
 import org.bekoocinema.service.MovieService;
@@ -59,6 +62,82 @@ public class MovieServiceImpl implements MovieService {
         movie.setGenres(genres);
         movie.setPosterUrl(posterUrl);
         movieRepository.save(movie);
+    }
+
+    @Override
+    @SneakyThrows
+    @Transactional
+    public void updateMovie(String movieId, UpdateMovieRequest updateMovieRequest) {
+        Movie movie = movieRepository.findById(movieId)
+            .orElseThrow(() -> new AppException(ErrorDetail.ERR_MOVIE_NOT_EXISTED));
+
+        if (updateMovieRequest.getName() != null && !updateMovieRequest.getName().isBlank()) {
+            movie.setName(updateMovieRequest.getName());
+        }
+        if (updateMovieRequest.getDirector() != null && !updateMovieRequest.getDirector().isBlank()) {
+            movie.setDirector(updateMovieRequest.getDirector());
+        }
+        if (updateMovieRequest.getPerformer() != null && !updateMovieRequest.getPerformer().isBlank()) {
+            movie.setPerformer(updateMovieRequest.getPerformer());
+        }
+        if (updateMovieRequest.getDescription() != null) {
+            movie.setDescription(updateMovieRequest.getDescription());
+        }
+        if (updateMovieRequest.getReleaseDate() != null && !updateMovieRequest.getReleaseDate().isBlank()) {
+            movie.setReleaseDate(LocalDateTime.parse(updateMovieRequest.getReleaseDate()));
+        }
+        if (updateMovieRequest.getCloseDate() != null && !updateMovieRequest.getCloseDate().isBlank()) {
+            movie.setCloseDate(LocalDateTime.parse(updateMovieRequest.getCloseDate()));
+        }
+        if (updateMovieRequest.getNation() != null) {
+            movie.setNation(updateMovieRequest.getNation());
+        }
+        if (updateMovieRequest.getDuration() != null) {
+            movie.setDuration(updateMovieRequest.getDuration());
+        }
+        if (updateMovieRequest.getNote() != null) {
+            movie.setNote(updateMovieRequest.getNote());
+        }
+        if (updateMovieRequest.getPrice() != null) {
+            movie.setPrice(updateMovieRequest.getPrice());
+        }
+        if (updateMovieRequest.getTrailerUrl() != null) {
+            movie.setTrailerUrl(updateMovieRequest.getTrailerUrl());
+        }
+
+        if (updateMovieRequest.getPosterFile() != null && !updateMovieRequest.getPosterFile().isEmpty()) {
+            String posterUrl = this.getFileUrl(updateMovieRequest.getPosterFile());
+            movie.setPosterUrl(posterUrl);
+        }
+
+        if (updateMovieRequest.getGenreIds() != null && !updateMovieRequest.getGenreIds().isEmpty()) {
+            Set<Genre> newGenres = new HashSet<>();
+            for (String genreId : updateMovieRequest.getGenreIds()) {
+                var genreOptional = genreRepository.findById(genreId);
+                genreOptional.ifPresent(newGenres::add);
+            }
+            movie.setGenres(newGenres);
+        }
+
+        movieRepository.save(movie);
+
+        Search.session(entityManager).indexingPlan().addOrUpdate(movie);
+    }
+
+    @Override
+    @SneakyThrows
+    @Transactional
+    public void deleteMovie(String movieId) {
+        Movie movie = movieRepository.findById(movieId)
+            .orElseThrow(() -> new AppException(ErrorDetail.ERR_MOVIE_NOT_EXISTED));
+
+        for(Genre genre : movie.getGenres()) {
+            genre.getMovies().remove(movie);
+        }
+        movie.getGenres().clear();
+
+        movieRepository.delete(movie);
+
     }
 
     @Override

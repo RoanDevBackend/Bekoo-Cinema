@@ -2,10 +2,12 @@ package org.bekoocinema.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.movie.CreateMovieRequest;
+import org.bekoocinema.request.movie.UpdateMovieRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.MovieService;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,30 @@ public class MovieController {
     public ApiResponse addMovie(@ModelAttribute @Valid CreateMovieRequest movieRequest) {
         movieService.addMovie(movieRequest);
         return ApiResponse.success(201, "Thêm thành công");
+    }
+
+    @Operation(
+            summary = "Cập nhật phim",
+            security = {
+                    @SecurityRequirement(name = "bearerAuth")
+            }
+    )
+    @PutMapping(EndPointConstant.PUBLIC + "/movie/{movieId}")
+    public ApiResponse updateMovie(@PathVariable String movieId, @ModelAttribute @Valid UpdateMovieRequest updateMovieRequest) {
+        movieService.updateMovie(movieId, updateMovieRequest);
+        return ApiResponse.success(200, "Cập nhật phim thành công");
+    }
+
+    @Operation(
+            summary = "Xóa phim",
+            security = {
+                    @SecurityRequirement(name = "bearerAuth")
+            }
+    )
+    @DeleteMapping(EndPointConstant.PUBLIC + "/movie/{movieId}")
+    public ApiResponse deleteMovie(@PathVariable String movieId) {
+        movieService.deleteMovie(movieId);
+        return ApiResponse.success(200, "Xóa phim thành công");
     }
 
     @Operation(summary = "Tìm kiếm phim", parameters = {
