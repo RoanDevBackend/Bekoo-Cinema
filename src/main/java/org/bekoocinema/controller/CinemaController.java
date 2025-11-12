@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.cinema.CreateCinemaRequest;
+import org.bekoocinema.request.cinema.UpdateCinemaRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.CinemaService;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,32 @@ public class CinemaController {
             @RequestParam(required = false, defaultValue = "1") int pageIndex,
             @RequestParam(required = false, defaultValue = "10") int pageSize) {
         return ApiResponse.success(200, "Lấy danh sách rạp thành công", cinemaService.getAllCinemas(pageIndex, pageSize));
+    }
+
+    @Operation(
+            summary = "Api dùng để cập nhật thông tin rạp",
+            security = {
+                    @SecurityRequirement(name = "bearerAuth")
+            }
+    )
+    @PutMapping("/cinema/{id}")
+    public ApiResponse updateCinema(
+            @PathVariable String id,
+            @ModelAttribute @Valid UpdateCinemaRequest updateCinemaRequest) {
+        cinemaService.updateCinema(id, updateCinemaRequest);
+        return ApiResponse.success(200, "Cập nhật rạp thành công");
+    }
+
+    @Operation(
+            summary = "Api dùng để xóa rạp",
+            security = {
+                    @SecurityRequirement(name = "bearerAuth")
+            }
+    )
+    @DeleteMapping("/cinema/{id}")
+    public ApiResponse deleteCinema(@PathVariable String id) {
+        cinemaService.deleteCinema(id);
+        return ApiResponse.success(200, "Xóa rạp thành công");
     }
 
     @Operation(
