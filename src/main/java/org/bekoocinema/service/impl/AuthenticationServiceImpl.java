@@ -62,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public TokenResponse verifyOtpSignIn(String OTP, User user) {
+    public TokenResponse verifyOtp(String OTP, User user) {
         this.verifyOtp(user.getEmail(), OTP);
         final long TIME_TOKEN = 1000L * 60 * 60 * 24;
         var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
@@ -96,24 +96,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    @Override
-    public TokenResponse verifyOtpForgotPassword(String OTP, User user) {
-        this.verifyOtp(user.getEmail(), OTP);
-
-        final long TIME_TOKEN = 1000L * 60 * 60 * 24;
-        var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
-        var refreshToken = jwtService.generateToken(user, TIME_TOKEN * 7);
-
-        return TokenResponse.builder()
-                .tokenContent(tokenContent)
-                .refreshToken(refreshToken)
-                .userId(user.getId())
-                .userName(user.getEmail())
-                .roleName(user.getRole())
-                .expToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN))
-                .expRefreshToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN * 2))
-                .build();
-    }
 
     @Override
     public void changePasswordNoAuth(String newPassword, User user) throws AppException {

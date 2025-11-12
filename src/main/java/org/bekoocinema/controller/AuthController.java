@@ -35,12 +35,12 @@ public class AuthController {
         return ApiResponse.success(200, "Vui lòng nhập mã xác thực được gửi về mail", authenticationService.getOtpSignIn(signInRequest));
     }
 
-    @Operation(summary = "Xác thực OTP sau khi đăng nhập", security = {
+    @Operation(summary = "Xác thực OTP khi đăng nhập hoăc reset pw", security = {
             @SecurityRequirement(name = "bearerAuth")
     })
-    @PostMapping("/verify-sign-in/{OTP}")
-    public ApiResponse verifySignIn(@PathVariable String OTP, @AuthenticationPrincipal User user){
-        return ApiResponse.success(200, "Đăng nhập thành công", authenticationService.verifyOtpSignIn(OTP, user));
+    @PostMapping("/verify/{OTP}")
+    public ApiResponse verify(@PathVariable String OTP, @AuthenticationPrincipal User user){
+        return ApiResponse.success(200, "Xác thực OTP thành công (đăng nhập || reset pw)", authenticationService.verifyOtp(OTP, user));
     }
 
     @Operation(summary = "Lấy thông tin tài khoản bẳng token", security = {
@@ -57,14 +57,6 @@ public class AuthController {
                 authenticationService.getOtpForgotPassword(email));
     }
 
-    @Operation(summary = "Xác thực OTP quên mật khẩu", security = {
-            @SecurityRequirement(name = "bearerAuth")
-    })
-    @PostMapping("/verify-forgot-password/{OTP}")
-    public ApiResponse verifyForgotPassword(@PathVariable String OTP, @AuthenticationPrincipal User user) {
-        return ApiResponse.success(200, "Xác thực thành công, vui lòng đổi mật khẩu mới",
-                authenticationService.verifyOtpForgotPassword(OTP, user));
-    }
 
     @Operation(summary = "Đổi mật khẩu mới sau khi xác thực OTP", security = {
             @SecurityRequirement(name = "bearerAuth")
