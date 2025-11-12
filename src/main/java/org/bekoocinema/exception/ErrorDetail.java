@@ -20,6 +20,7 @@ public enum ErrorDetail {
     , ERR_SHOWTIME_CONFLICT(409, "Phòng chiếu đã có lịch chiếu khác trong khung giờ này")
     , ERR_BOOKING_NOT_EXISTED(404, "Mã vé đặt không tồn tại")
     , ERR_ORDER_TIME_VALID(400, "Đơn hàng đã qúa thời gian thanh toán")
+    , ERR_NEW_PASSWORD_SAME_AS_OLD(400, "Mật khẩu mới phải khác mật khẩu cũ")
     ;
 
     private final int code;

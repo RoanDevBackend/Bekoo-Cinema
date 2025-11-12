@@ -62,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public TokenResponse verifyOtp(String OTP, User user) {
+    public TokenResponse verifyOtpSignIn(String OTP, User user) {
         this.verifyOtp(user.getEmail(), OTP);
         final long TIME_TOKEN = 1000L * 60 * 60 * 24;
         var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
@@ -81,34 +81,46 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @SneakyThrows
-    public TokenResponse getOtpForgotPassword(String email) {
+    public void getOtpForgotPassword(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new AppException(ErrorDetail.ERR_USER_NOT_EXISTED);
         }
         this.getOtp(user.getEmail());
-        final long TIME_TOKEN = 1000L * 60 * 2;
-        var tokenContent = jwtService.generateToken(user, TIME_TOKEN);
-
-        return TokenResponse.builder()
-                .tokenContent(tokenContent)
-                .expToken(new Timestamp(System.currentTimeMillis() + TIME_TOKEN))
-                .build();
     }
 
+    @Override
+    public void verifyOtpForgotPassword(String OTP, String email) throws AppException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AppException(ErrorDetail.ERR_USER_NOT_EXISTED);
+        }
+        this.verifyOtp(user.getEmail(), OTP);
+        redisRepository.set(user.getEmail() + "_VERIFIED", "true");
+        redisRepository.setTimeToLive(user.getEmail() + "_VERIFIED", 5 * 60L * 1000);
+    }
 
     @Override
-    public void changePasswordNoAuth(String newPassword, User user) throws AppException {
-        Object verified = redisRepository.get(user.getEmail());
-        if (verified == null || !"verified".equals(verified.toString())) {
+    public void changePasswordNoAuth(String newPassword, String email)
+        throws AppException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AppException(ErrorDetail.ERR_USER_NOT_EXISTED);
+        }
+
+        if(passwordEncoder.matches(newPassword, user.getPassword()) ){
+            throw new AppException(ErrorDetail.ERR_NEW_PASSWORD_SAME_AS_OLD);
+        }
+        
+        Object verified = redisRepository.get(user.getEmail() + "_VERIFIED");
+        if (verified == null || !"true".equals(verified.toString())) {
             throw new AppException(ErrorDetail.ERR_USER_SESSION_EXPIRED);
-            
         }
         
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         
-        redisRepository.delete(user.getEmail());
+        redisRepository.delete(user.getEmail() + "_VERIFIED");
     }
 
     private void getOtp(String mail) throws AppException, MessagingException, UnsupportedEncodingException {
