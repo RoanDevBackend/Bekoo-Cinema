@@ -8,6 +8,7 @@ import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.mapper.UserMapper;
 import org.bekoocinema.repository.UserRepository;
 import org.bekoocinema.request.auth.RegisterUserRequest;
+import org.bekoocinema.request.user.ChangePasswordAuthRequest;
 import org.bekoocinema.request.user.ProfileUpdateRequest;
 import org.bekoocinema.response.user.UserResponse;
 import org.bekoocinema.service.UserService;
@@ -47,5 +48,19 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(user);
         return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public void changePassword(ChangePasswordAuthRequest request, User user) throws AppException {
+        if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorDetail.ERR_OLD_PASSWORD_INCORRECT);
+        }
+
+        if(passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new AppException(ErrorDetail.ERR_NEW_PASSWORD_SAME_AS_OLD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

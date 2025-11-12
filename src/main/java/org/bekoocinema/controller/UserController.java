@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bekoocinema.entity.User;
+import org.bekoocinema.exception.AppException;
+import org.bekoocinema.request.user.ChangePasswordAuthRequest;
 import org.bekoocinema.request.user.ProfileUpdateRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.UserService;
@@ -27,4 +29,15 @@ public class UserController {
     public ApiResponse updateProfile(@RequestBody @Valid ProfileUpdateRequest profileUpdateRequest, @AuthenticationPrincipal User user) {
         return ApiResponse.success(200, "Cập nhật thông tin thành công", userService.updateProfile(profileUpdateRequest, user));
     }
+
+    @Operation(
+            summary = "Đổi mật khẩu",
+            security = { @SecurityRequirement(name = "bearerAuth") }
+    )
+    @PutMapping("/user/change-password")
+    public ApiResponse changePassword(@RequestBody @Valid ChangePasswordAuthRequest request, @AuthenticationPrincipal User user) throws AppException {
+        userService.changePassword(request, user);
+        return ApiResponse.success(200, "Đổi mật khẩu thành công");
+    }
+
 }
