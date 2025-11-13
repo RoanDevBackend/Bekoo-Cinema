@@ -16,6 +16,12 @@ public class GenreController {
 
     final GenreService genreService;
 
+    @Operation(
+            summary = "Tạo thể loại",
+            security = {
+                    @SecurityRequirement(name = "bearerAuth")
+            }
+    )
     @PostMapping("/genre/{genreName}")
     public ApiResponse addGenre(@PathVariable String genreName) {
         genreService.addGenre(genreName);
@@ -37,6 +43,10 @@ public class GenreController {
         return ApiResponse.success(200, "Tìm kiếm thành công", genreService.getAllGenres(genreName));
     }
 
+    @Operation(
+            summary = "Xóa thể loại phim",
+            security = { @SecurityRequirement(name = "bearerAuth") }
+    )
     @DeleteMapping("/genre/{genreId}")
     public ApiResponse deleteGenre(@PathVariable String genreId) {
         genreService.deleteGenre(genreId);
