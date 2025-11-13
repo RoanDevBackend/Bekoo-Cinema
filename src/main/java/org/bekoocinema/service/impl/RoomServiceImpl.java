@@ -126,11 +126,6 @@ public class RoomServiceImpl implements RoomService {
     public void deleteRoom(String roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new AppException(ErrorDetail.ERR_ROOM_NOT_EXISTED));
-
-        if (!room.getShowtimes().isEmpty()) {
-            throw new RuntimeException("Không thể xóa phòng chiếu đang có lịch chiếu");
-        }
-
         Set<Seat> seats = room.getSeats();
         seatRepository.deleteAll(seats);
         seats.clear();
