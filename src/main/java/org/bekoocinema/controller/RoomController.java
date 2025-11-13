@@ -29,7 +29,7 @@ public class RoomController {
                 @SecurityRequirement(name = "bearerAuth")
         }
     )
-    @PutMapping(EndPointConstant.PUBLIC + "/room/{roomId}")
+    @PutMapping("/room/{roomId}")
     public ApiResponse updateRoom(@PathVariable String roomId, @RequestBody @Valid UpdateRoomRequest updateRoomRequest) {
         roomService.updateRoom(roomId, updateRoomRequest);
         return ApiResponse.success(200, "Cập nhật phòng chiếu thành công");
@@ -41,7 +41,7 @@ public class RoomController {
                 @SecurityRequirement(name = "bearerAuth")
         }
     )
-    @DeleteMapping(EndPointConstant.PUBLIC + "/room/{roomId}")
+    @DeleteMapping("/room/{roomId}")
     public ApiResponse deleteRoom(@PathVariable String roomId) {
         roomService.deleteRoom(roomId);
         return ApiResponse.success(200, "Xóa phòng chiếu thành công");
