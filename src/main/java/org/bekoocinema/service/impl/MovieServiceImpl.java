@@ -243,6 +243,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional(readOnly = true)
+    @SneakyThrows
     public List<MovieResponse> getMovieByDate(String date) {
         LocalDate localDate = LocalDate.parse(date);
         LocalDateTime startOfDay = localDate.atStartOfDay();
@@ -250,7 +251,7 @@ public class MovieServiceImpl implements MovieService {
 
         List<Movie> movies = movieRepository.getMovieByDate(startOfDay, endOfDay);
         if (movies.isEmpty()) {
-            throw new DataAccessResourceFailureException("Không có phim nào trong ngày này");
+            throw new RuntimeException("Không có phim nào trong ngày này");
         }
 
         return movies.stream()
