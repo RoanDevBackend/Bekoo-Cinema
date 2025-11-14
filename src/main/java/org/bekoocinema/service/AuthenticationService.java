@@ -12,8 +12,8 @@ public interface AuthenticationService {
     void verifyOtpForgotPassword(String OTP, String email) throws AppException;
     void changePasswordNoAuth(String newPassword, String email)
         throws AppException;
-//    void logout(String token);
-//    void getOtp(String mail) throws BeautyBoxException, MessagingException, UnsupportedEncodingException;
-//    void verifyOtp(String mail, String otp);
-//    void changePassword(ChangePassword changePassword, User user) throws BeautyBoxException;
+    void logout(String accessToken, String refreshToken);
+    //    void getOtp(String mail) throws BeautyBoxException, MessagingException, UnsupportedEncodingException;
+    //    void verifyOtp(String mail, String otp);
+    //    void changePassword(ChangePassword changePassword, User user) throws BeautyBoxException;
 }

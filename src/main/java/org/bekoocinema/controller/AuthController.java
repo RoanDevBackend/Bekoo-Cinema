@@ -13,6 +13,7 @@ import org.bekoocinema.request.auth.SignInRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.AuthenticationService;
 import org.bekoocinema.service.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,4 +74,20 @@ public class AuthController {
         return ApiResponse.success(200, "Đổi mật khẩu thành công");
     }
 
+    @Operation(
+        summary = "Đăng xuất",
+        security = { @SecurityRequirement(name = "bearerAuth") }
+    )
+    @PostMapping("/logout")
+    public ApiResponse logout(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
+        @RequestHeader(value = "X-Refresh-Token") String refreshToken)
+    {
+        String accessToken = null;
+        if(authHeader != null && authHeader.startsWith("Bearer ")) {
+            accessToken = authHeader.substring(7);
+        }
+        authenticationService.logout(accessToken, refreshToken);
+        return ApiResponse.success(200, "Đăng xuất thành công");
+    }
 }

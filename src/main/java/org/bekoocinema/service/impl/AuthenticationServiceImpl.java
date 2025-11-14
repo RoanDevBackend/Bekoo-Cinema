@@ -123,6 +123,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         redisRepository.delete(user.getEmail() + "_VERIFIED");
     }
 
+    @Override
+    public void logout(String accessToken, String refreshToken) {
+        if (accessToken == null || accessToken.isBlank()) {
+            throw new RuntimeException("Access token không hợp lệ");
+        }
+
+        String username = jwtService.extractUsername(accessToken);
+        User user = userRepository.findByUserName(username);
+
+        if (user == null) {
+            throw new RuntimeException("User không tồn tại");
+        }
+
+        Long accessTokenExpiration = jwtService.getExpirationToken(accessToken);
+        redisRepository.set(accessToken, "logged_out");
+        redisRepository.setTimeToLive(accessToken, accessTokenExpiration);
+
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            Long refreshTokenExpiration = jwtService.getExpirationToken(refreshToken);
+            redisRepository.set(refreshToken, "logged_out");
+            redisRepository.setTimeToLive(refreshToken, refreshTokenExpiration);
+        }
+
+        String userTokenKey = "user_tokens:" + user.getId();
+        redisRepository.set(userTokenKey, "logged_out");
+        redisRepository.setTimeToLive(userTokenKey, 7 * 24 * 60 * 60 * 1000L);
+    }
+
     private void getOtp(String mail) throws AppException, MessagingException, UnsupportedEncodingException {
         User user= userRepository.findByUserName(mail);
         if(user==null){
