@@ -8,9 +8,10 @@ import org.bekoocinema.response.TokenResponse;
 public interface AuthenticationService {
     TokenResponse getOtpSignIn(SignInRequest signInRequest);
     TokenResponse verifyOtpSignIn(String OTP, User user);
-    TokenResponse getOtpForgotPassword(String email);
-    TokenResponse verifyOtpForgotPassword(String OTP, User user);
-    void changePasswordNoAuth(String newPassword, User user) throws AppException;
+    void getOtpForgotPassword(String email);
+    void verifyOtpForgotPassword(String OTP, String email) throws AppException;
+    void changePasswordNoAuth(String newPassword, String email)
+        throws AppException;
 //    void logout(String token);
 //    void getOtp(String mail) throws BeautyBoxException, MessagingException, UnsupportedEncodingException;
 //    void verifyOtp(String mail, String otp);

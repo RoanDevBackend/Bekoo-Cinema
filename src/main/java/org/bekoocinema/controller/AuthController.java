@@ -53,26 +53,23 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ApiResponse forgotPassword(@RequestParam String email) {
-        return ApiResponse.success(200, "Vui lòng nhập mã xác thực được gửi về mail",
-                authenticationService.getOtpForgotPassword(email));
+        authenticationService.getOtpForgotPassword(email);
+        return ApiResponse.success(200, "Mã OTP đã được gửi đến email của bạn");
     }
 
-    @Operation(summary = "Xác thực OTP quên mật khẩu", security = {
-            @SecurityRequirement(name = "bearerAuth")
-    })
+    @Operation(summary = "Xác thực OTP quên mật khẩu")
     @PostMapping("/verify-forgot-password/{OTP}")
-    public ApiResponse verifyForgotPassword(@PathVariable String OTP, @AuthenticationPrincipal User user) {
-        return ApiResponse.success(200, "Xác thực thành công, vui lòng đổi mật khẩu mới",
-                authenticationService.verifyOtpForgotPassword(OTP, user));
+    public ApiResponse verifyForgotPassword(@PathVariable String OTP, @RequestParam String email) throws AppException {
+        authenticationService.verifyOtpForgotPassword(OTP, email);
+        return ApiResponse.success(200, "Xác thực thành công, vui lòng đổi mật khẩu mới"
+        );
     }
 
-    @Operation(summary = "Đổi mật khẩu mới sau khi xác thực OTP", security = {
-            @SecurityRequirement(name = "bearerAuth")
-    })
+    @Operation(summary = "Đổi mật khẩu mới sau khi xác thực OTP")
     @PostMapping("/reset-password")
     public ApiResponse resetPassword(@RequestBody @Valid ChangePasswordRequest request,
-            @AuthenticationPrincipal User user) throws AppException {
-        authenticationService.changePasswordNoAuth(request.getNewPassword(), user);
+                                     @RequestParam String email) throws AppException {
+        authenticationService.changePasswordNoAuth(request.getNewPassword(), email);
         return ApiResponse.success(200, "Đổi mật khẩu thành công");
     }
 

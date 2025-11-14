@@ -26,17 +26,19 @@ public class WebSecurity {
     final AuthenticationProvider authenticationProvider;
     final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    final String[] listUnAuthenticate = {
-        "/sign-in",
-        "/otp-sign-in",
-        "/register",
-        "/v3/api-docs/**",
-        "/swagger-ui/**",
-        "/swagger-ui.html",
-        "/forgot-password",
-        "/payment-result",
-        "/socket/seat/**",
-        EndPointConstant.PUBLIC + "/**",
+    final String[] listUnAuthenticate={
+            "/sign-in"
+            , "/otp-sign-in"
+            , "/register"
+            , "/v3/api-docs/**"
+            , "/swagger-ui/**"
+            , "/swagger-ui.html"
+            , "/forgot-password"
+            , "/verify-forgot-password/**"
+            , "/reset-password"
+            , "/payment-result"
+            , "/socket/seat/**"
+            , EndPointConstant.PUBLIC + "/**"
     };
 
     final String[] adminEndpoints = {
