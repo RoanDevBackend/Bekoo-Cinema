@@ -60,6 +60,7 @@ public class WebSecurity {
         "/verify-sign-in/**",
         "/verify-forgot-password/**",
         "/reset-password",
+        "/logout"
     };
 
     @Bean
@@ -81,6 +82,7 @@ public class WebSecurity {
                                         .anyRequest()
                                             .authenticated()
                 )
+                .logout(AbstractHttpConfigurer::disable) // Vô hiệu hóa default logout của Spring Security
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter , UsernamePasswordAuthenticationFilter.class);
