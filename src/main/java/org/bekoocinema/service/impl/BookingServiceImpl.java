@@ -33,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     final BookingMapper bookingMapper;
     final RedisRepository redisRepository;
     final ObjectMapper objectMapper;
+    final UserRepository userRepository;
     @Value("${vnpay.return.url}")
     String vnp_ReturnUrl;
 
@@ -69,10 +70,10 @@ public class BookingServiceImpl implements BookingService {
         booking.setMovieName(showtime.getMovie().getName());
         Set<Genre> genres = showtime.getMovie().getGenres();
         StringBuilder genreName = new StringBuilder();
-        for(Genre genre : genres){
-            if(genreName.equals("")) {
+        for (Genre genre : genres) {
+            if (genreName.equals("")) {
                 genreName.append(genre.getName());
-            }else {
+            } else {
                 genreName.append(genre.getName()).append(",");
             }
         }
@@ -97,8 +98,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @SneakyThrows
-    public List<BookingResponse> getBookings(User user) {
-        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
+    public List<BookingResponse> getBookings(User user, String bookingId){
+        User fullUser = userRepository.findByEmail(user.getUsername());
+        if(fullUser == null) {
+            throw new RuntimeException("User không tồn tại");
+        }
+        List<Booking> bookings = bookingRepository.findAllByUserIdAndId(fullUser.getId(), bookingId);
         return bookings.stream().map(bookingMapper::toResponse).collect(Collectors.toList());
     }
 

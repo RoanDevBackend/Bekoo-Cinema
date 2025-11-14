@@ -26,25 +26,38 @@ public class WebSecurity {
     final AuthenticationProvider authenticationProvider;
     final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    final String[] listUnAuthenticate={
-            "/sign-in"
-            , "/otp-sign-in"
-            , "/register"
-            , "/v3/api-docs/**"
-            , "/swagger-ui/**"
-            , "/swagger-ui.html"
-            , "/forgot-password"
-            , "/payment-result"
-            , "/socket/seat/**"
-            , EndPointConstant.PUBLIC + "/**"
+    final String[] listUnAuthenticate = {
+        "/sign-in",
+        "/otp-sign-in",
+        "/register",
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/forgot-password",
+        "/payment-result",
+        "/socket/seat/**",
+        EndPointConstant.PUBLIC + "/**",
     };
 
-    final String[] getMappings={
-
+    final String[] adminEndpoints = {
+        "/cinema",
+        "/cinema/**",
+        "/genre",
+        "/genre/**",
+        "/movie",
+        "/movie/**",
+        "/room",
+        "/room/**",
+        "/showtime",
+        "/reset-seat/**",
     };
-    final String[] postMappings={
-//            "/token/refresh/**"
-//            ,"/specialize/query-all"
+
+    final String[] userEndpoints = {
+        "/booking",
+        "/token",
+        "/verify-sign-in/**",
+        "/verify-forgot-password/**",
+        "/reset-password",
     };
 
     @Bean
@@ -59,8 +72,10 @@ public class WebSecurity {
                                             .permitAll()
                                         .requestMatchers(listUnAuthenticate)
                                             .permitAll()
-                                        .requestMatchers(HttpMethod.GET ,getMappings)
-                                            .permitAll()
+                                        .requestMatchers(adminEndpoints)
+                                            .hasRole("ADMIN")
+                                        .requestMatchers(userEndpoints)
+                                            .hasAnyRole("USER", "ADMIN")
                                         .anyRequest()
                                             .authenticated()
                 )
