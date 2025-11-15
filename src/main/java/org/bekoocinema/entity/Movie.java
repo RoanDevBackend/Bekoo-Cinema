@@ -26,6 +26,7 @@ public class Movie extends BaseEntity{
     @FullTextField(analyzer = "vietnameseAnalyzer")
     @KeywordField(name = "name_sort", normalizer = "lowercase", sortable = Sortable.YES)
     String name;
+    @Column(columnDefinition = "text")
     @FullTextField(analyzer = "vietnameseAnalyzer")
     String description;
     String director;
