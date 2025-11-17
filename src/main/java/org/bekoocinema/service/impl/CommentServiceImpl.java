@@ -5,12 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bekoocinema.entity.Comment;
 import org.bekoocinema.entity.Movie;
+import org.bekoocinema.entity.MovieRate;
 import org.bekoocinema.entity.User;
 import org.bekoocinema.exception.AppException;
 import org.bekoocinema.exception.ErrorDetail;
 import org.bekoocinema.repository.CommentRepository;
+import org.bekoocinema.repository.MovieRateRepository;
 import org.bekoocinema.repository.MovieRepository;
 import org.bekoocinema.request.comment.NewCommentRequest;
+import org.bekoocinema.request.comment.NewRatingRequest;
 import org.bekoocinema.response.comment.CommentResponse;
 import org.bekoocinema.service.CommentService;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class CommentServiceImpl implements CommentService {
 
     final CommentRepository commentRepository;
     final MovieRepository movieRepository;
+    final MovieRateRepository movieRateRepository;
 
     @Override
     @SneakyThrows
@@ -42,6 +47,26 @@ public class CommentServiceImpl implements CommentService {
             comment.setParent(commentParent);
         }
         commentRepository.save(comment);
+    }
+
+    @Override
+    @SneakyThrows
+    public String newRate(NewRatingRequest newRatingRequest, User user) {
+        Movie movie = movieRepository.findById(newRatingRequest.getMovieId())
+                .orElseThrow(() -> new AppException(ErrorDetail.ERR_MOVIE_NOT_EXISTED));
+        Optional<MovieRate> movieRateExisted = movieRateRepository.findByMovieIdAndUserId(movie.getId(), user.getId());
+        if(movieRateExisted.isPresent()){
+            MovieRate movieRate = movieRateExisted.get();
+            movieRate.setRating(newRatingRequest.getRate());
+            movieRateRepository.save(movieRate);
+            return "Đã update rating";
+        }
+        MovieRate movieRate = new MovieRate();
+        movieRate.setRating(newRatingRequest.getRate());
+        movieRate.setUser(user);
+        movieRate.setMovie(movie);
+        movieRateRepository.save(movieRate);
+        return "Đã thêm lượt rating";
     }
 
     @Override

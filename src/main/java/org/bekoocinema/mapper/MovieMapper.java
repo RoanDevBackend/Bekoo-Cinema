@@ -1,21 +1,29 @@
 package org.bekoocinema.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.bekoocinema.entity.Genre;
 import org.bekoocinema.entity.Movie;
 import org.bekoocinema.entity.Showtime;
+import org.bekoocinema.repository.MovieRateRepository;
 import org.bekoocinema.request.movie.CreateMovieRequest;
+import org.bekoocinema.response.comment.RateResponse;
 import org.bekoocinema.response.movie.MovieResponse;
 import org.bekoocinema.response.showtime.ShowtimeDetailResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring", imports = {java.time.LocalDateTime.class})
 public abstract class MovieMapper {
+
+    @Autowired
+    MovieRateRepository movieRateRepository;
 
     @Mapping(target = "releaseDate", expression = "java(this.convertDate(createMovieRequest.getReleaseDate()))")
     @Mapping(target = "closeDate", expression = "java(this.convertDate(createMovieRequest.getCloseDate()))")
@@ -26,6 +34,7 @@ public abstract class MovieMapper {
 
     @Mapping(target = "genres", expression = "java(this.convertGenre(movie.getGenres()))")
     @Mapping(target = "showtimeDetailResponses", expression = "java(this.convertShowtimes(movie.getShowtimes()))")
+    @Mapping(target = "rate", expression = "java(this.getRating(movie.getId()))")
     public abstract MovieResponse toMovieResponse(Movie movie);
     protected List<String> convertGenre(Set<Genre> genres){
         return genres.stream().map(Genre::getName).toList();
@@ -47,5 +56,16 @@ public abstract class MovieMapper {
                     return response;
                 })
                 .toList();
+    }
+
+    protected RateResponse getRating(String movieId){
+        List<Integer> ratings = movieRateRepository.getByMovie(movieId);
+        IntSummaryStatistics stats = ratings.stream()
+                .mapToInt(Integer::intValue)
+                .summaryStatistics();
+
+        double avgRating = stats.getAverage();
+        long voteCount = stats.getCount();
+        return new RateResponse(voteCount, avgRating);
     }
 }

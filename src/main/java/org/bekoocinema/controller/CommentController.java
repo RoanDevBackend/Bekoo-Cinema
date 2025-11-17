@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.entity.User;
 import org.bekoocinema.request.comment.NewCommentRequest;
+import org.bekoocinema.request.comment.NewRatingRequest;
 import org.bekoocinema.response.ApiResponse;
 import org.bekoocinema.service.CommentService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,12 @@ public class CommentController {
     public ApiResponse newComment(@RequestBody NewCommentRequest newCommentRequest, @AuthenticationPrincipal User user) {
         commentService.newComment(newCommentRequest, user);
         return ApiResponse.success(201, "Thêm bình luận thành công");
+    }
+
+    @PostMapping("/rating")
+    public ApiResponse newComment(@RequestBody NewRatingRequest newRatingRequest, @AuthenticationPrincipal User user) {
+        String messageResponse = commentService.newRate(newRatingRequest, user);
+        return ApiResponse.success(201, messageResponse);
     }
 
     @GetMapping(EndPointConstant.PUBLIC + "/comment/{movieId}")
