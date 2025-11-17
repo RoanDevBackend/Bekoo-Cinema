@@ -12,14 +12,16 @@ import org.bekoocinema.repository.*;
 import org.bekoocinema.request.room.CreateShowtimeRequest;
 import org.bekoocinema.response.room.RoomResponse;
 import org.bekoocinema.response.room.SeatResponse;
-import org.bekoocinema.response.showtime.ShowtimeDetailResponse;
-import org.bekoocinema.response.showtime.ShowtimeResponse;
+import org.bekoocinema.response.showtime.*;
 import org.bekoocinema.service.ShowtimeService;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -115,4 +117,151 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         }
         seatRepository.saveAll(seats);
     }
+
+    @Override
+    @Transactional
+    public Object getShowtimeSchedule(String cinemaId, String date, int days) {
+        if(days < 1 || days > 7) {
+            throw new IllegalArgumentException("Số ngày phải từ 1 đến 7");
+        }
+
+        LocalDate startDate = date != null && !date.isBlank() ? LocalDate.parse(date) : LocalDate.now();
+
+        LocalDate endDate = startDate.plusDays(days);
+
+        List<Cinema> cinemas;
+        if(cinemaId != null && !cinemaId.isBlank()) {
+            Cinema cinema = cinemaRepository.findById(cinemaId)
+                .orElseThrow(() -> new RuntimeException("Rạp chiếu không tồn tại"));
+            cinemas = Collections.singletonList(cinema);
+        }else{
+            cinemas = cinemaRepository.findAll();
+        }
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        Map<String, String> dayOfWeekMap = Map.of(
+            "MONDAY",
+            "Thứ 2",
+            "TUESDAY",
+            "Thứ 3",
+            "WEDNESDAY",
+            "Thứ 4",
+            "THURSDAY",
+            "Thứ 5",
+            "FRIDAY",
+            "Thứ 6",
+            "SATURDAY",
+            "Thứ 7",
+            "SUNDAY",
+            "Chủ nhật"
+        );
+
+        List<CinemaScheduleMainResponse> cinemaSchedules = new ArrayList<>();
+
+        for(Cinema cinema : cinemas) {
+            List<DateMovieScheduleResponse> dateSchedules = new ArrayList<>();
+
+            for(LocalDate currentDate = startDate; currentDate.isBefore(endDate); currentDate = currentDate.plusDays(1)){
+                LocalDateTime dayStart = currentDate.atStartOfDay();
+                LocalDateTime dayEnd = currentDate.atTime(23, 59, 59);
+
+                List<Showtime> showtimes = showtimeRepository.findByCinemaAndDateRange(cinema.getId(), dayStart, dayEnd);
+
+                if(showtimes.isEmpty()) continue;
+
+
+                Map<String, List<Showtime>> showtimesByMovie = showtimes.stream()
+                    .collect(Collectors.groupingBy(st -> st.getMovie().getId()));
+
+                List<MovieScheduleResponse> movieSchedules = new ArrayList<>();
+
+                for(Map.Entry<String, List<Showtime>> entry : showtimesByMovie.entrySet()) {
+                    List<Showtime> movieShowtimes = entry.getValue();
+                    if(movieShowtimes.isEmpty()) continue;
+
+                    Movie movie = movieShowtimes.get(0).getMovie();
+
+                    List<ShowtimeItemResponse> showtimeItems = movieShowtimes
+                        .stream()
+                        .sorted(Comparator.comparing(Showtime::getStartTime))
+                        .map(st -> {
+                            int totalSeats = st.getRoom().getSeats().size();
+                            int availableSeats = (int) st
+                                .getRoom()
+                                .getSeats()
+                                .stream()
+                                .filter(seat -> !seat.isBooked())
+                                .count();
+
+                            return ShowtimeItemResponse.builder()
+                                .showtimeId(st.getId())
+                                .startTime(st.getStartTime()
+                                        .toLocalTime()
+                                        .format(timeFormatter)
+                                )
+                                .endTime(st.getEndTime()
+                                        .toLocalTime()
+                                        .format(timeFormatter)
+                                )
+                                .roomId(st.getRoom().getId())
+                                .roomName(st.getRoom().getName())
+                                .availableSeats(availableSeats)
+                                .totalSeats(totalSeats)
+                                .build();
+                        })
+                        .collect(Collectors.toList());
+
+                    List<String> genres = movie
+                            .getGenres()
+                        .stream()
+                        .map(Genre::getName)
+                        .collect(Collectors.toList());
+
+                    MovieScheduleResponse movieSchedule = MovieScheduleResponse.builder()
+                            .movieId(movie.getId())
+                            .movieName(movie.getName())
+                            .posterUrl(movie.getPosterUrl())
+                            .duration(movie.getDuration())
+                            .ageRating(movie.getNote())
+                            .genres(genres)
+                            .showtimes(showtimeItems)
+                            .build();
+
+                    movieSchedules.add(movieSchedule);
+                }
+
+                if(!movieSchedules.isEmpty()) {
+                    movieSchedules.sort(Comparator.comparing(MovieScheduleResponse::getMovieName)
+                    );
+
+                    DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+                    DateMovieScheduleResponse dateSchedule = DateMovieScheduleResponse.builder()
+                            .date(currentDate.format(dateFormatter))
+                            .dayOfWeek(dayOfWeekMap.get(dayOfWeek.toString()))
+                            .movies(movieSchedules)
+                            .build();
+
+                    dateSchedules.add(dateSchedule);
+                }
+            }
+
+            if(!dateSchedules.isEmpty()) {
+                CinemaScheduleMainResponse cinemaSchedule = CinemaScheduleMainResponse.builder()
+                        .cinemaId(cinema.getId())
+                        .cinemaName(cinema.getName())
+                        .address(cinema.getAddress())
+                        .province(cinema.getProvince())
+                        .district(cinema.getDistrict())
+                        .dateSchedules(dateSchedules)
+                        .build();
+
+                cinemaSchedules.add(cinemaSchedule);
+            }
+        }
+
+        return cinemaSchedules;
+    }
+
+
 }
