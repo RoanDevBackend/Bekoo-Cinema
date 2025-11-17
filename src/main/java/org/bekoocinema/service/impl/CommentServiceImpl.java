@@ -15,6 +15,9 @@ import org.bekoocinema.response.comment.CommentResponse;
 import org.bekoocinema.service.CommentService;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -33,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
         Movie movie = movieRepository.findById(newCommentRequest.getMovieId())
                 .orElseThrow(() -> new AppException(ErrorDetail.ERR_MOVIE_NOT_EXISTED));
         comment.setMovie(movie);
-        if(!newCommentRequest.getParentCommentId().isBlank()){
+        if(newCommentRequest.getParentCommentId() != null && !newCommentRequest.getParentCommentId().isBlank()){
             Comment commentParent = commentRepository.findById(newCommentRequest.getParentCommentId())
                     .orElseThrow(() -> new AppException(ErrorDetail.ERR_COMMENT_PARENT_NOT_EXISTED));
             comment.setParent(commentParent);
@@ -44,28 +47,49 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public List<CommentResponse> getCommentByMovie(String movieId) {
-        return commentRepository.getCommentByMovie(movieId).stream().map(t -> {
-            CommentResponse commentResponse = new CommentResponse();
-            commentResponse.setId(t.getId());
-            commentResponse.setContent(t.getContent());
-            commentResponse.setAuthor(t.getUser().getFullName());
-            commentResponse.setTotalChildComment(commentRepository.getCommentByParentComment(t.getId()).size());
-            return commentResponse;
-        }).toList();
+        return commentRepository.getCommentByMovie(movieId).stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
     @Override
     @Transactional
     public List<CommentResponse> getCommentByParent(String parentCommentId) {
         return commentRepository.getCommentByParentComment(parentCommentId).stream()
-                .map(t -> {
-                    CommentResponse commentResponse = new CommentResponse();
-                    commentResponse.setId(t.getId());
-                    commentResponse.setContent(t.getContent());
-                    commentResponse.setAuthor(t.getUser().getFullName());
-                    commentResponse.setTotalChildComment(commentRepository.getCommentByParentComment(t.getId()).size());
-                    return commentResponse;
-                })
+                .map(this::convertToResponse)
                 .toList();
+    }
+
+    private CommentResponse convertToResponse(Comment t) {
+        CommentResponse commentResponse = new CommentResponse();
+        commentResponse.setId(t.getId());
+        commentResponse.setContent(t.getContent());
+        commentResponse.setAuthor(t.getUser().getFullName());
+        commentResponse.setCreatedDate(this.convertDateToString(t.getCreatedAt()));
+        commentResponse.setTotalChildComment(commentRepository.getCommentByParentComment(t.getId()).size());
+        return commentResponse;
+    }
+
+    private String convertDateToString(LocalDateTime time) {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(time, now);
+
+        long seconds = duration.getSeconds();
+        long minutes = duration.toMinutes();
+        long hours = duration.toHours();
+        long days = duration.toDays();
+
+        if (seconds < 60) {
+            return "Vài giây trước";
+        } else if (minutes < 60) {
+            return minutes + " phút trước";
+        } else if (hours < 24) {
+            return hours + " giờ trước";
+        } else if (days <= 5) {
+            return days + " ngày trước";
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return time.format(formatter);
+        }
     }
 }

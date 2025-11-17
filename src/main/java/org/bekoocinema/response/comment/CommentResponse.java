@@ -12,5 +12,6 @@ public class CommentResponse {
     String id;
     String author;
     String content;
+    String createdDate;
     int totalChildComment;
 }
