@@ -58,8 +58,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        Object a = redisRepository.get(jwt);
-        if(a != null) { // kiểm tra JWT có đăng đang đăng xuất không
+        
+        Object blacklisted = redisRepository.get(jwt);
+        if(blacklisted != null) {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            ApiResponse apiResponse = ApiResponse.error(401, "Token đã bị vô hiệu hóa. Vui lòng đăng nhập lại!");
+            String content = objectMapper.writeValueAsString(apiResponse);
+            response.getWriter().write(content);
             return;
         }
 
