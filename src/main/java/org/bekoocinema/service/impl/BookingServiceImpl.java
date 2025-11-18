@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
             if (genreName.equals("")) {
                 genreName.append(genre.getName());
             } else {
-                genreName.append(genre.getName()).append(",");
+                genreName.append(",").append(genre.getName());
             }
         }
         booking.setGenreName(genreName.toString());
@@ -91,6 +91,9 @@ public class BookingServiceImpl implements BookingService {
         booking.setPhone(user.getPhone());
 
         booking.setTotalPrice(totalPrice);
+        booking.setStartTime(showtime.getStartTime());
+        booking.setEndTime(showtime.getEndTime());
+        booking.setPosterUrl(showtime.getMovie().getPosterUrl());
 
         String urlPayment = this.getUrlPayment(booking, request);
         return urlPayment;

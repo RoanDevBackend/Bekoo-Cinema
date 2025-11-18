@@ -28,4 +28,7 @@ public class BookingResponse {
     String email;
     String phone;
     long totalPrice;
+    LocalDateTime startTime;
+    LocalDateTime endTime;
+    String posterUrl;
 }
