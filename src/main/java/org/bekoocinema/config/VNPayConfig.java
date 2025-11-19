@@ -19,8 +19,8 @@ public class VNPayConfig {
     public  static String vnp_Command = "pay";
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_TmnCode = "NYZ1AM7E";
-    public static String secretKey = "YKIJ5GUX8WFIWFGRN2AGZQDG5GQGWOZ3";
+    public static String vnp_TmnCode = "C65J5ZNP";
+    public static String secretKey = "HSP2NSC2KUOJMZA1G7LAARDSTASOR3Y4";
 
     public static String md5(String message) {
         String digest = null;
