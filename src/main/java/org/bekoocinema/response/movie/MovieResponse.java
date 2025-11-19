@@ -25,6 +25,7 @@ public class MovieResponse {
     int duration;
     String note;
     int price;
+    long totalComment;
     RateResponse rate;
     String trailerUrl;
     String posterUrl;

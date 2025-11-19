@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bekoocinema.entity.Genre;
 import org.bekoocinema.entity.Movie;
 import org.bekoocinema.entity.Showtime;
+import org.bekoocinema.repository.CommentRepository;
 import org.bekoocinema.repository.MovieRateRepository;
 import org.bekoocinema.request.movie.CreateMovieRequest;
 import org.bekoocinema.response.comment.RateResponse;
@@ -24,6 +25,8 @@ public abstract class MovieMapper {
 
     @Autowired
     MovieRateRepository movieRateRepository;
+    @Autowired
+    CommentRepository commentRepository;
 
     @Mapping(target = "releaseDate", expression = "java(this.convertDate(createMovieRequest.getReleaseDate()))")
     @Mapping(target = "closeDate", expression = "java(this.convertDate(createMovieRequest.getCloseDate()))")
@@ -35,10 +38,8 @@ public abstract class MovieMapper {
     @Mapping(target = "genres", expression = "java(this.convertGenre(movie.getGenres()))")
     @Mapping(target = "showtimeDetailResponses", expression = "java(this.convertShowtimes(movie.getShowtimes()))")
     @Mapping(target = "rate", expression = "java(this.getRating(movie.getId()))")
+    @Mapping(target = "totalComment", expression = "java(this.getTotalComment(movie.getId()))")
     public abstract MovieResponse toMovieResponse(Movie movie);
-    protected List<String> convertGenre(Set<Genre> genres){
-        return genres.stream().map(Genre::getName).toList();
-    }
 
     protected List<ShowtimeDetailResponse> convertShowtimes(Set<Showtime> showtimes) {
         if (showtimes == null || showtimes.isEmpty()) return List.of();
@@ -67,5 +68,13 @@ public abstract class MovieMapper {
         double avgRating = stats.getAverage();
         long voteCount = stats.getCount();
         return new RateResponse(voteCount, avgRating);
+    }
+
+    protected long getTotalComment(String movieId){
+        return commentRepository.totalCommentByMovie(movieId);
+    }
+
+    protected List<String> convertGenre(Set<Genre> genres){
+        return genres.stream().map(Genre::getName).toList();
     }
 }
