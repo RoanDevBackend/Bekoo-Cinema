@@ -36,4 +36,7 @@ public class Booking {
     String email;
     String phone;
     long totalPrice;
+    LocalDateTime startTime;
+    LocalDateTime endTime;
+    String posterUrl;
 }

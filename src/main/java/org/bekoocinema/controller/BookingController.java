@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
     final BookingService bookingService;
 
+    @Operation(
+            summary = "User tạo đơn",
+            security = { @SecurityRequirement(name = "bearerAuth") }
+    )
     @PostMapping("/booking")
     public ApiResponse booking(@RequestBody @Valid BookingRequest bookingRequest, @AuthenticationPrincipal User user, HttpServletRequest request) {
         return ApiResponse.success(200, "Hãy thanh toán", bookingService.booking(bookingRequest, user, request));
