@@ -14,4 +14,11 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
             "AND (:id IS NULL OR :id = '' OR b.id LIKE CONCAT('%', :id, '%'))"
     )
     List<Booking> findAllByUserIdAndId(String userId, String id);
+
+    long countByPaymentStatus(String paymentStatus);
+
+    @Query(
+        "SELECT SUM(b.totalPrice) FROM Booking b WHERE b.paymentStatus = :paymentStatus"
+    )
+    Long sumTotalPriceByPaymentStatus(String paymentStatus);
 }
