@@ -5,6 +5,7 @@ import org.bekoocinema.request.cinema.UpdateCinemaRequest;
 import org.bekoocinema.response.PageResponse;
 import org.bekoocinema.response.cinema.CinemaMovieScheduleResponse;
 import org.bekoocinema.response.cinema.CinemaResponse;
+import org.bekoocinema.response.movie.MovieResponse;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public interface CinemaService {
     PageResponse<?> getAllCinemas(int pageIndex, int pageSize);
     void updateCinema(String id, UpdateCinemaRequest updateCinemaRequest);
     void deleteCinema(String id);
-    CinemaMovieScheduleResponse getMovieSchedule(String cinemaId, String startDate);
+    List<MovieResponse> getMoviesByCinemaAndDate(String cinemaId, String date);
 }

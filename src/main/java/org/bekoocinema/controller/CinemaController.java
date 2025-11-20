@@ -76,17 +76,16 @@ public class CinemaController {
     }
 
     @Operation(
-            summary = "Lấy danh sách phim chiếu theo rạp (phân theo ngày trong 1 tuần)",
+            summary = "Lấy danh sách phim chiếu theo rạp trong ngày",
             parameters = {
                     @Parameter(name = "cinemaId", description = "ID của rạp chiếu", required = true),
-                    @Parameter(name = "startDate",
-                            description = "Ngày bắt đầu (format: yyyy-MM-dd), mặc định là hôm nay"),
+                    @Parameter(name = "date", description = "Ngày cần lấy phim (format: yyyy-MM-dd)", required = true)
             }
     )
-    @GetMapping(EndPointConstant.PUBLIC + "/cinema/{cinemaId}/movies")
-    public ApiResponse getMovieSchedule(@PathVariable String cinemaId, @RequestParam(required = false) String startDate) {
-        return ApiResponse.success(200, "Lấy lịch chiếu phim theo rạp thành công",
-                cinemaService.getMovieSchedule(cinemaId, startDate)
+    @GetMapping(EndPointConstant.PUBLIC + "/cinema/{cinemaId}/movies/by-date/{date}")
+    public ApiResponse getMoviesByCinemaAndDate(@PathVariable String cinemaId, @PathVariable String date) {
+        return ApiResponse.success(200, "Lấy phim theo rạp và ngày thành công",
+                cinemaService.getMoviesByCinemaAndDate(cinemaId, date)
         );
     }
 
