@@ -68,8 +68,8 @@ public class CinemaServiceImpl implements CinemaService {
     }
 
     @Override
-    public List<CinemaResponse> getCinema(String keyWord) {
-        List<Cinema> cinemas = cinemaRepository.getAllByKey(keyWord);
+    public List<CinemaResponse> getCinema(String keyWord, String province) {
+        List<Cinema> cinemas = cinemaRepository.getAllByKey(keyWord, province);
         List<CinemaResponse> cinemaResponses = new ArrayList<>();
         for (Cinema cinema : cinemas) {
             CinemaResponse cinemaResponse = cinemaMapper.toCinemaResponse(cinema);

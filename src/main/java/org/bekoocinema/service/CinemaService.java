@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CinemaService {
     void addCinema(CreateCinemaRequest createCinemaRequest);
-    List<CinemaResponse> getCinema(String keyWord);
+    List<CinemaResponse> getCinema(String keyWord, String province);
     CinemaResponse getCinemaById(String id);
     PageResponse<?> getAllCinemas(int pageIndex, int pageSize);
     void updateCinema(String id, UpdateCinemaRequest updateCinemaRequest);
