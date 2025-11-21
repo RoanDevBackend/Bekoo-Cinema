@@ -26,6 +26,17 @@ public interface MovieRepository extends JpaRepository<Movie, String> {
     List<Movie> getMovieByDate(@Param("startOfDay") LocalDateTime startOfDay,
                                @Param("endOfDay") LocalDateTime endOfDay);
 
+    @Query("""
+        SELECT DISTINCT m
+        FROM Movie m
+        LEFT JOIN FETCH m.showtimes s
+        LEFT JOIN FETCH m.genres g
+        WHERE s.room.cinema.id = :cinemaId
+        AND s.startTime BETWEEN :startOfDay AND :endOfDay
+    """)
+    List<Movie> getMoviesByCinemaAndDate(@Param("cinemaId") String cinemaId,
+                                         @Param("startOfDay") LocalDateTime startOfDay,
+                                         @Param("endOfDay") LocalDateTime endOfDay);
 
     @Query("""
         FROM Movie m
