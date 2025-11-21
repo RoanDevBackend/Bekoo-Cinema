@@ -44,10 +44,12 @@ public abstract class MovieMapper {
     protected List<ShowtimeDetailResponse> convertShowtimes(Set<Showtime> showtimes) {
         if (showtimes == null || showtimes.isEmpty()) return List.of();
 
+        LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         return showtimes.stream()
+                .filter(showtime -> showtime.getStartTime().isAfter(now) || showtime.getStartTime().isEqual(now))
                 .map(showtime -> {
                     ShowtimeDetailResponse response = new ShowtimeDetailResponse();
                     response.setId(showtime.getId());
