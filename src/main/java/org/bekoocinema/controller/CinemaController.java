@@ -28,11 +28,14 @@ public class CinemaController {
     }
 
     @Operation(summary = "Tìm kiếm rạp phim", parameters = {
-            @Parameter(name = "keyWord", description = "Tên rạp hoặc địa chỉ rạp theo tỉnh")
+            @Parameter(name = "keyWord", description = "Tên rạp"),
+            @Parameter(name = "province", description = "Lọc theo tỉnh/thành phố")
     })
     @GetMapping(EndPointConstant.PUBLIC + "/cinema/key")
-    public ApiResponse getCinemaByDistrict(@RequestParam(required = false, defaultValue = "") String keyWord) {
-        return ApiResponse.success(200, "Tìm thành công", cinemaService.getCinema(keyWord));
+    public ApiResponse getCinemaByDistrict(
+            @RequestParam(required = false, defaultValue = "") String keyWord,
+            @RequestParam(required = false, defaultValue = "") String province) {
+        return ApiResponse.success(200, "Tìm thành công", cinemaService.getCinema(keyWord, province));
     }
 
     @Operation(summary = "Lấy chi tiết rạp chiếu")

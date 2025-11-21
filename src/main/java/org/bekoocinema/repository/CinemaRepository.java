@@ -11,11 +11,14 @@ import java.util.List;
 public interface CinemaRepository extends JpaRepository<Cinema, String> {
 
     @Query("FROM Cinema c " +
-            "WHERE :keyWord IS NULL OR " +
+            "WHERE (:keyWord IS NULL OR " +
             ":keyWord = '' OR " +
-            "c.province LIKE CONCAT('%', :keyWord, '%') OR " +
-            "c.name LIKE CONCAT('%', :keyWord, '%') ")
-    List<Cinema> getAllByKey(String keyWord);
+//            "c.province LIKE CONCAT('%', :keyWord, '%') OR " +
+            "c.name LIKE CONCAT('%', :keyWord, '%')) " +
+            "AND (:province IS NULL OR " +
+            ":province = '' OR " +
+            "c.province LIKE CONCAT('%', :province, '%'))")
+    List<Cinema> getAllByKey(String keyWord, String province);
 
     @Query("FROM Cinema c ORDER BY c.name ASC")
     Page<Cinema> findAllCinemas(Pageable pageable);
