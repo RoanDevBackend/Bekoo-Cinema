@@ -13,6 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import org.springframework.core.env.Environment;
 @Log4j2
 @SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class})
 @RequiredArgsConstructor
+@EnableScheduling
 public class BekooCinemaApplication implements CommandLineRunner {
 
     public static void main(String[] args) {

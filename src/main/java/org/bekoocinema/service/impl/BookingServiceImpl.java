@@ -155,6 +155,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.save(booking);
                 value = "Thanh toán thành công!";
             }else {
+                bookingRepository.delete(booking);
                 if (vnp_ResponseCode.equals("11"))
                     value = "Giao dịch không thành công do: Đã hết hạn chờ thanh toán. Xin quý khách vui lòng thực hiện lại giao dịch.";
                 if (vnp_ResponseCode.equals("12"))

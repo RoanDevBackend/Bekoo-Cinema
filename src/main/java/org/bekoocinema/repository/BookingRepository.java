@@ -1,5 +1,6 @@
 package org.bekoocinema.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.bekoocinema.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,10 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
             "FROM Booking b " +
             "WHERE b.showtimeId = :showtimeId ")
     List<String> getSeatBooked(String showtimeId);
+
+    @Query("FROM Booking b " +
+            "WHERE b.paymentDate IS NULL " +
+            "AND b.bookingDate < :cutOff ")
+    List<Booking> getBookingNotPayment(LocalDateTime cutOff);
+
 }
