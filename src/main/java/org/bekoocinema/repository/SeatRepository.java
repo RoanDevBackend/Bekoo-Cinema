@@ -12,11 +12,4 @@ public interface SeatRepository extends JpaRepository<Seat, String> {
     @Query("FROM Seat s " +
             "WHERE s.id in :ids ")
     List<Seat> getSeatInId(List<String> ids);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Seat s " +
-            "SET s.isBooked = :isBooked " +
-            "WHERE s.id IN :seatIds")
-    void updateBooked(boolean isBooked, List<String> seatIds);
 }

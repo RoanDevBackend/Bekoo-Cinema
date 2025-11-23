@@ -30,6 +30,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     final MovieRepository movieRepository;
     final RoomRepository roomRepository;
     final CinemaRepository cinemaRepository;
+    final BookingRepository bookingRepository;
     final RoomMapper roomMapper;
     final SeatMapper seatMapper;
     private final SeatRepository seatRepository;
@@ -80,6 +81,14 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             showtimeResponse.setDetailAddress(cinema.getDetailAddress());
             List<ShowtimeDetailResponse> showtimeDetailResponses = new ArrayList<>();
             for(Showtime showtimeItem : showtimes){
+
+                List<String> tempSeatIdBooked = bookingRepository.getSeatBooked(showtimeItem.getId());
+                List<String> seatIdBooked = tempSeatIdBooked.stream()
+                        .flatMap(s -> Arrays.stream(s.split(",")))
+                        .map(String::trim)
+                        .filter(id -> !id.isEmpty())
+                        .toList();
+
                 ShowtimeDetailResponse showtimeDetailResponse = new ShowtimeDetailResponse();
                 showtimeDetailResponse.setId(showtimeItem.getId());
                 String date = showtimeItem.getStartTime().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy:MM:dd"));
@@ -92,6 +101,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                 List<SeatResponse> seatResponses = new ArrayList<>();
                 for(Seat seat : showtimeItem.getRoom().getSeats()) {
                     SeatResponse seatResponse = seatMapper.toResponse(seat);
+                    seatResponse.setBooked(seatIdBooked.contains(seat.getId()));
                     seatResponses.add(seatResponse);
                 }
                 roomResponse.setSeats(seatResponses);
@@ -102,20 +112,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             showtimeResponses.add(showtimeResponse);
         }
         return showtimeResponses;
-    }
-
-    @Override
-    @Transactional
-    public void resetSeat(String showtimeId) {
-        Showtime showtime = showtimeRepository.findById(showtimeId)
-                .orElseThrow(
-                        () -> new RuntimeException("Xuất chiếu không tồn tại")
-                );
-        Set<Seat> seats = showtime.getRoom().getSeats();
-        for(Seat seat : seats){
-            seat.setBooked(false);
-        }
-        seatRepository.saveAll(seats);
     }
 
     @Override
@@ -186,12 +182,18 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                         .stream()
                         .sorted(Comparator.comparing(Showtime::getStartTime))
                         .map(st -> {
+                            List<String> tempSeatIdBooked = bookingRepository.getSeatBooked(st.getId());
+                            List<String> seatIdBooked = tempSeatIdBooked.stream()
+                                    .flatMap(s -> Arrays.stream(s.split(",")))
+                                    .map(String::trim)
+                                    .filter(id -> !id.isEmpty())
+                                    .toList();
                             int totalSeats = st.getRoom().getSeats().size();
                             int availableSeats = (int) st
                                 .getRoom()
                                 .getSeats()
                                 .stream()
-                                .filter(seat -> !seat.isBooked())
+                                .filter(seat -> !seatIdBooked.contains(seat.getId()))
                                 .count();
 
                             return ShowtimeItemResponse.builder()

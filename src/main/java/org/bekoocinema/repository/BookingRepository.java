@@ -21,4 +21,9 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
         "SELECT SUM(b.totalPrice) FROM Booking b WHERE b.paymentStatus = :paymentStatus"
     )
     Long sumTotalPriceByPaymentStatus(String paymentStatus);
+
+    @Query("SELECT b.seatIds " +
+            "FROM Booking b " +
+            "WHERE b.showtimeId = :showtimeId ")
+    List<String> getSeatBooked(String showtimeId);
 }

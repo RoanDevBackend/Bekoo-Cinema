@@ -20,7 +20,6 @@ public class Seat {
     int colIdx;
     int rowIdx;
     String status;
-    boolean isBooked;
     @ManyToOne
     @JoinColumn(name = "room_id")
     Room room;

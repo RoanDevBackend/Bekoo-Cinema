@@ -19,6 +19,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    String showtimeId;
     LocalDateTime bookingDate;
     String movieName;
     String movieId;

@@ -36,21 +36,29 @@ public class BookingServiceImpl implements BookingService {
     final UserRepository userRepository;
     @Value("${vnpay.return.url}")
     String vnp_ReturnUrl;
+    final String PAYMENT_STATUS_PENDING = "Chờ thanh toán";
 
     @Override
     @Transactional
+    @SneakyThrows
     public String booking(BookingRequest bookingRequest, User user, HttpServletRequest request) {
         Showtime showtime = showtimeRepository.findById(bookingRequest.getShowtimeId())
                 .orElseThrow(
                         () -> new RuntimeException("Xuất chiếu không tồn tại")
                 );
+        List<String> tempSeatIdBooked = bookingRepository.getSeatBooked(showtime.getId());
+        List<String> seatIdsSelected = tempSeatIdBooked.stream()
+                .flatMap(s -> Arrays.stream(s.split(",")))
+                .map(String::trim)
+                .filter(id -> !id.isEmpty())
+                .toList();
         long totalPrice = 0;
         StringBuilder seatNames = new StringBuilder();
         StringBuilder seatIds = new StringBuilder();
-        List<Seat> seatsBooked = seatRepository.getSeatInId(bookingRequest.getSeatIds());
-        for(Seat seat : seatsBooked) {
-            if(seat.isBooked()) {
-                throw new RuntimeException("Ghế " + seat.getSeatName() + " đã được đặt");
+        List<Seat> seatReqBooking = seatRepository.getSeatInId(bookingRequest.getSeatIds());
+        for(Seat seat : seatReqBooking) {
+            if(seatIdsSelected.contains(seat.getId())) {
+                throw new RuntimeException("Ghế đã được đặt");
             }
             totalPrice =  totalPrice + seat.getPrice();
             if(seatNames.toString().equals("")) {
@@ -60,11 +68,9 @@ public class BookingServiceImpl implements BookingService {
                 seatNames.append(", ").append(seat.getSeatName());
                 seatIds.append(", ").append(seat.getId());
             }
-            seat.setBooked(true);
         }
-        seatRepository.saveAll(seatsBooked);
         Booking booking = new Booking();
-        booking.setId(UUID.randomUUID().toString());
+        booking.setShowtimeId(bookingRequest.getShowtimeId());
         booking.setBookingDate(LocalDateTime.now());
         booking.setMovieId(showtime.getMovie().getId());
         booking.setMovieName(showtime.getMovie().getName());
@@ -84,7 +90,6 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setCinemaName(showtime.getRoom().getCinema().getName());
         booking.setCinemaAddress(showtime.getRoom().getCinema().getAddress());
-        booking.setPaymentStatus("Chưa thanh toán");
         booking.setUserId(user.getId());
         booking.setFullName(user.getFullName());
         booking.setEmail(user.getEmail());
@@ -94,6 +99,9 @@ public class BookingServiceImpl implements BookingService {
         booking.setStartTime(showtime.getStartTime());
         booking.setEndTime(showtime.getEndTime());
         booking.setPosterUrl(showtime.getMovie().getPosterUrl());
+
+        booking.setPaymentStatus(PAYMENT_STATUS_PENDING);
+        bookingRepository.save(booking);
 
         String urlPayment = this.getUrlPayment(booking, request);
         return urlPayment;
@@ -136,7 +144,7 @@ public class BookingServiceImpl implements BookingService {
             }
             Booking booking = objectMapper.readValue(bookingJson, Booking.class);
             LocalDateTime createdDate = booking.getBookingDate();
-            LocalDateTime timeout = createdDate.plusMinutes(15); // Huỷ thanh toán sau khi quá 15p
+            LocalDateTime timeout = createdDate.plusMinutes(10); // Huỷ thanh toán sau khi quá 15p
             if(LocalDateTime.now().isAfter(timeout)) {
                 throw new AppException(ErrorDetail.ERR_ORDER_TIME_VALID);
             }
@@ -144,12 +152,9 @@ public class BookingServiceImpl implements BookingService {
             if(vnp_ResponseCode.equals("00")){
                 booking.setPaymentDate(LocalDateTime.now());
                 booking.setPaymentStatus("Đã thanh toán thành công");
-                booking.setId(null);
                 bookingRepository.save(booking);
                 value = "Thanh toán thành công!";
             }else {
-                String[] seatIds = booking.getSeatIds().split(",");
-                seatRepository.updateBooked(false, Arrays.stream(seatIds).map(String::trim).toList());
                 if (vnp_ResponseCode.equals("11"))
                     value = "Giao dịch không thành công do: Đã hết hạn chờ thanh toán. Xin quý khách vui lòng thực hiện lại giao dịch.";
                 if (vnp_ResponseCode.equals("12"))

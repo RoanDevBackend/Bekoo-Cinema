@@ -10,7 +10,6 @@ import java.util.Map;
 
 public interface ShowtimeService {
     void newShowTime(CreateShowtimeRequest createRequest) throws AppException;
-    void resetSeat(String showtimeId);
     List<ShowtimeResponse> getShowtime(String movieId);
     Object getShowtimeSchedule(String cinemaId, String date, int days);
 
