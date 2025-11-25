@@ -160,7 +160,11 @@ public class RoomServiceImpl implements RoomService {
     @Transactional()
     public RoomResponse getRoom(String id) {
         Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
+                .orElse(null);
+        
+        if(room == null) {
+            return null;
+        }
         
         RoomResponse roomResponse = roomMapper.toResponse(room);
         List<SeatResponse> seatResponses = new ArrayList<>();

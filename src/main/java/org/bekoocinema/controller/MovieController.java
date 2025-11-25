@@ -9,8 +9,11 @@ import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.movie.CreateMovieRequest;
 import org.bekoocinema.request.movie.UpdateMovieRequest;
 import org.bekoocinema.response.ApiResponse;
+import org.bekoocinema.response.movie.MovieResponse;
 import org.bekoocinema.service.MovieService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -73,12 +76,18 @@ public class MovieController {
 
     @GetMapping(EndPointConstant.PUBLIC + "/movie/{id}")
     public ApiResponse getMovieById(@PathVariable String id) {
-        return ApiResponse.success(200, "Thành công", movieService.getMovieById(id));
+        MovieResponse movie = movieService.getMovieById(id);
+        if (movie == null) {
+            return ApiResponse.success(200, "Không tìm thấy phim", null);
+        }
+        return ApiResponse.success(200, "Thành công", movie);
     }
 
     @GetMapping(EndPointConstant.PUBLIC + "/movie/by-date/{date}")
     public ApiResponse getMovieByDate(@PathVariable String date) {
-        return ApiResponse.success(200, "Lấy các phim chiếu theo ngày thành công", movieService.getMovieByDate(date));
+        List<?> movies = movieService.getMovieByDate(date);
+        String message = movies.isEmpty() ? "Không có phim nào trong ngày này" : "Lấy các phim chiếu theo ngày thành công";
+        return ApiResponse.success(200, message, movies);
     }
 
 

@@ -237,7 +237,10 @@ public class MovieServiceImpl implements MovieService {
     @Transactional(readOnly = true)
     public MovieResponse getMovieById(String id) {
         Movie movie = movieRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim"));
+                .orElse(null);
+        if(movie == null){
+            return null;
+        }
         return movieMapper.toMovieResponse(movie);
     }
 
@@ -250,10 +253,8 @@ public class MovieServiceImpl implements MovieService {
         LocalDateTime endOfDay = localDate.atTime(23, 59, 59);
 
         List<Movie> movies = movieRepository.getMovieByDate(startOfDay, endOfDay);
-        if (movies.isEmpty()) {
-            throw new RuntimeException("Không có phim nào trong ngày này");
-        }
-
+        
+        // Return empty list instead of throwing exception - no data is not an error
         return movies.stream()
                 .map(movieMapper::toMovieResponse)
                 .toList();
