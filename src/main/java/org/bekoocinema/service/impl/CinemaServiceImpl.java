@@ -323,7 +323,6 @@ public class CinemaServiceImpl implements CinemaService {
 
         List<Movie> movies = movieRepository.getMoviesByCinemaAndDate(cinemaId, startOfDay, endOfDay);
         
-        // Return empty list instead of throwing exception - no data is not an error
         return movies.stream()
                 .map(movieMapper::toMovieResponse)
                 .toList();

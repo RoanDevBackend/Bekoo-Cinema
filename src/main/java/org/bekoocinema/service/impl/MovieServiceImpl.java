@@ -254,7 +254,6 @@ public class MovieServiceImpl implements MovieService {
 
         List<Movie> movies = movieRepository.getMovieByDate(startOfDay, endOfDay);
         
-        // Return empty list instead of throwing exception - no data is not an error
         return movies.stream()
                 .map(movieMapper::toMovieResponse)
                 .toList();
