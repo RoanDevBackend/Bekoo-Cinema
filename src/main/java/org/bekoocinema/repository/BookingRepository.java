@@ -33,4 +33,6 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
             "AND b.bookingDate < :cutOff ")
     List<Booking> getBookingNotPayment(LocalDateTime cutOff);
 
+    boolean existsByShowtimeId(String showtimeId);
+
 }

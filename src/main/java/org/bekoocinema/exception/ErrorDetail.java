@@ -18,6 +18,8 @@ public enum ErrorDetail {
     , ERR_ROOM_NOT_EXISTED(400, "Phòng chiếu không tồn tại")
     , ERR_MOVIE_NOT_EXISTED(400, "Bộ phim không tồn tại")
     , ERR_SHOWTIME_CONFLICT(409, "Phòng chiếu đã có lịch chiếu khác trong khung giờ này")
+    , ERR_SHOWTIME_NOT_EXISTED(400, "Xuất chiếu không tồn tại")
+    , ERR_SHOWTIME_HAS_BOOKINGS(400, "Không thể xóa xuất chiếu vì đã có người đặt vé")
     , ERR_BOOKING_NOT_EXISTED(404, "Mã vé đặt không tồn tại")
     , ERR_ORDER_TIME_VALID(400, "Đơn hàng đã qúa thời gian thanh toán")
     , ERR_OLD_PASSWORD_INCORRECT(400, "Mật khẩu cũ không chính xác")
