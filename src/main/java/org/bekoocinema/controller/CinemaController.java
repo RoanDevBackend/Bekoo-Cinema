@@ -9,8 +9,11 @@ import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.cinema.CreateCinemaRequest;
 import org.bekoocinema.request.cinema.UpdateCinemaRequest;
 import org.bekoocinema.response.ApiResponse;
+import org.bekoocinema.response.cinema.CinemaResponse;
 import org.bekoocinema.service.CinemaService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +44,11 @@ public class CinemaController {
     @Operation(summary = "Lấy chi tiết rạp chiếu")
     @GetMapping(EndPointConstant.PUBLIC + "/cinema/{id}")
     public ApiResponse getCinemaById(@PathVariable String id){
-        return ApiResponse.success(200, "Lấy rạp thành công", cinemaService.getCinemaById(id));
+        CinemaResponse cinema = cinemaService.getCinemaById(id);
+        if (cinema == null) {
+            return ApiResponse.success(200, "Không tìm thấy rạp chiếu", null);
+        }
+        return ApiResponse.success(200, "Lấy rạp thành công", cinema);
     }
 
     @Operation(summary = "Lấy danh sách tất cả rạp chiếu")
@@ -79,18 +86,16 @@ public class CinemaController {
     }
 
     @Operation(
-            summary = "Lấy danh sách phim chiếu theo rạp trong ngày",
-            parameters = {
-                    @Parameter(name = "cinemaId", description = "ID của rạp chiếu", required = true),
-                    @Parameter(name = "date", description = "Ngày cần lấy phim (format: yyyy-MM-dd)", required = true)
-            }
+        summary = "Lấy danh sách phim chiếu theo rạp trong ngày",
+        parameters = {
+                @Parameter(name = "cinemaId", description = "ID của rạp chiếu", required = true),
+                @Parameter(name = "date", description = "Ngày cần lấy phim (format: yyyy-MM-dd)", required = true)
+        }
     )
     @GetMapping(EndPointConstant.PUBLIC + "/cinema/{cinemaId}/movies/by-date/{date}")
     public ApiResponse getMoviesByCinemaAndDate(@PathVariable String cinemaId, @PathVariable String date) {
-        return ApiResponse.success(200, "Lấy phim theo rạp và ngày thành công",
-                cinemaService.getMoviesByCinemaAndDate(cinemaId, date)
-        );
+        List<?> movies = cinemaService.getMoviesByCinemaAndDate(cinemaId, date);
+        String message = movies.isEmpty() ? "Không có phim nào chiếu tại rạp này trong ngày " + date : "Lấy phim theo rạp và ngày thành công";
+        return ApiResponse.success(200, message, movies);
     }
-
-
 }

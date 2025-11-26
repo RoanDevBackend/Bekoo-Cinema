@@ -8,6 +8,7 @@ import org.bekoocinema.constant.EndPointConstant;
 import org.bekoocinema.request.room.CreateRoomRequest;
 import org.bekoocinema.request.room.UpdateRoomRequest;
 import org.bekoocinema.response.ApiResponse;
+import org.bekoocinema.response.room.RoomResponse;
 import org.bekoocinema.service.RoomService;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +61,10 @@ public class RoomController {
     @Operation(summary = "Lấy chi tiết phòng chiếu")
     @GetMapping("/public-api/room/{roomId}")
     public ApiResponse getRoomById(@PathVariable String roomId) {
-        return ApiResponse.success(200, "Lấy chi tiết phòng chiếu thành công", roomService.getRoom(roomId));
+        RoomResponse room = roomService.getRoom(roomId);
+        if(room == null) {
+            return ApiResponse.success(200, "Không tìm thấy phòng chiếu", null);
+        }
+        return ApiResponse.success(200, "Lấy chi tiết phòng chiếu thành công", room);
     }
 }

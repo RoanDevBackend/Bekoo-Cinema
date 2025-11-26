@@ -89,7 +89,11 @@ public class CinemaServiceImpl implements CinemaService {
     @Override
     public CinemaResponse getCinemaById(String id) {
         Cinema cinema = cinemaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cinema not found"));
+                .orElse(null);
+        
+        if(cinema == null){
+            return null;
+        }
         
         CinemaResponse cinemaResponse = cinemaMapper.toCinemaResponse(cinema);
         List<String> urlsCinema = imageRepository.getUrlByTargetId("cinema", cinema.getId());
@@ -318,10 +322,7 @@ public class CinemaServiceImpl implements CinemaService {
         LocalDateTime endOfDay = localDate.atTime(23, 59, 59);
 
         List<Movie> movies = movieRepository.getMoviesByCinemaAndDate(cinemaId, startOfDay, endOfDay);
-        if (movies.isEmpty()) {
-            throw new RuntimeException("Không có phim nào chiếu tại rạp này trong ngày " + date);
-        }
-
+        
         return movies.stream()
                 .map(movieMapper::toMovieResponse)
                 .toList();

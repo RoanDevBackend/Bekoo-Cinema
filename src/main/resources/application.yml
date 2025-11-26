@@ -12,12 +12,13 @@ spring:
       hibernate:
         format_sql: true
         search:
+          enabled: true
           backend:
             hosts: ${elastic.host}
             username: ${elastic.username}
             password: ${elastic.password}
             analysis:
-              configurer: org.beautybox.config.ElasticsearchAnalysisConfig
+              configurer: org.bekoocinema.config.ElasticsearchAnalysisConfig
           schema_management:
             strategy: create-or-update
     hibernate:
