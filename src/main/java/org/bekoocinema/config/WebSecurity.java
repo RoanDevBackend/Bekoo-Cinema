@@ -51,6 +51,7 @@ public class WebSecurity {
         "/room",
         "/room/**",
         "/showtime",
+        "/showtime/**",
         "/reset-seat/**",
         "/statistics",
     };

@@ -10,6 +10,7 @@ import org.bekoocinema.mapper.RoomMapper;
 import org.bekoocinema.mapper.SeatMapper;
 import org.bekoocinema.repository.*;
 import org.bekoocinema.request.room.CreateShowtimeRequest;
+import org.bekoocinema.request.room.UpdateShowtimeRequest;
 import org.bekoocinema.response.room.RoomResponse;
 import org.bekoocinema.response.room.SeatResponse;
 import org.bekoocinema.response.showtime.*;
@@ -263,6 +264,53 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         }
 
         return cinemaSchedules;
+    }
+
+    @Override
+    @Transactional
+    public void updateShowTime(String showtimeId, UpdateShowtimeRequest updateRequest) throws AppException {
+        Showtime showtime = showtimeRepository.findById(showtimeId)
+                .orElseThrow(() -> new AppException(ErrorDetail.ERR_SHOWTIME_NOT_EXISTED));
+        
+        Room room = roomRepository.findById(updateRequest.getRoomId())
+                .orElseThrow(() -> new AppException(ErrorDetail.ERR_ROOM_NOT_EXISTED));
+        
+        Movie movie = movieRepository.findById(updateRequest.getMovieId())
+                .orElseThrow(() -> new AppException(ErrorDetail.ERR_MOVIE_NOT_EXISTED));
+        
+        LocalDateTime startTime = LocalDateTime.parse(updateRequest.getStartTime());
+        LocalDateTime endTime = LocalDateTime.parse(updateRequest.getEndTime());
+        
+        boolean hasConflict = showtimeRepository.existsConflictingShowtimeExcludingId(
+                updateRequest.getRoomId(),
+                startTime,
+                endTime,
+                showtimeId
+        );
+        
+        if(hasConflict) {
+            throw new AppException(ErrorDetail.ERR_SHOWTIME_CONFLICT);
+        }
+        
+        showtime.setRoom(room);
+        showtime.setMovie(movie);
+        showtime.setStartTime(startTime);
+        showtime.setEndTime(endTime);
+        showtimeRepository.save(showtime);
+    }
+
+    @Override
+    @Transactional
+    public void deleteShowTime(String showtimeId) throws AppException {
+        Showtime showtime = showtimeRepository.findById(showtimeId)
+                .orElseThrow(() -> new AppException(ErrorDetail.ERR_SHOWTIME_NOT_EXISTED));
+        
+        boolean hasBookings = bookingRepository.existsByShowtimeId(showtimeId);
+        if(hasBookings) {
+            throw new AppException(ErrorDetail.ERR_SHOWTIME_HAS_BOOKINGS);
+        }
+        
+        showtimeRepository.delete(showtime);
     }
 
 

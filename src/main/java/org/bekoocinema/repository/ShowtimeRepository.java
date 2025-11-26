@@ -23,6 +23,17 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
             @Param("endTime") LocalDateTime endTime
     );
 
+    @Query("SELECT COUNT(st) > 0 FROM Showtime st " +
+            "WHERE st.room.id = :roomId " +
+            "AND st.id <> :showtimeId " +
+            "AND ((st.startTime < :endTime AND st.endTime > :startTime))")
+    boolean existsConflictingShowtimeExcludingId(
+            @Param("roomId") String roomId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime,
+            @Param("showtimeId") String showtimeId
+    );
+
     @Query(
         "SELECT DISTINCT st FROM Showtime st " +
             "LEFT JOIN FETCH st.movie m " +
