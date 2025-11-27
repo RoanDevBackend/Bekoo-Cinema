@@ -10,5 +10,6 @@ import java.util.List;
 @Service
 public interface ReportService {
     List<ReportChartTemplateResponse> getChartByPrice(LocalDate from, LocalDate to, int groupType);
+    public List<ReportChartTemplateResponse> getChartByBooking(LocalDate from, LocalDate to, int groupType);
     TotalReportResponse getTotalReportResponse();
 }

@@ -41,4 +41,6 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
             "AND b.bookingDate < :end "
     )
     Long getTotalPrice(LocalDateTime start, LocalDateTime end);
+
+    long countByBookingDateBetween(LocalDateTime start, LocalDateTime end);
 }

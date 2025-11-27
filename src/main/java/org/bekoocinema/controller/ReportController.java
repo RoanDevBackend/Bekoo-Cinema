@@ -32,6 +32,19 @@ public class ReportController {
         return ApiResponse.success(200, "OK", response);
     }
 
+    @GetMapping("/booking")
+    @Operation(summary = "Báo cáo thống kê số lượt đặt vé xem phim", parameters = {
+            @Parameter(name = "groupType", description = "1-Theo ngày, 2-Theo tuần, 3-Theo tháng, 4-Theo năm")
+    })
+    public ApiResponse totalBooking(@RequestParam String fromDate,
+                                  @RequestParam String toDate,
+                                  @RequestParam int groupType) {
+        LocalDate from = LocalDate.parse(fromDate);
+        LocalDate to = LocalDate.parse(toDate);
+        var response = reportService.getChartByBooking(from, to, groupType);
+        return ApiResponse.success(200, "OK", response);
+    }
+
     @GetMapping("/total")
     @Operation(summary = "Báo cáo thống kê doanh thu đặt vé xem phim", parameters = {
             @Parameter(name = "groupType", description = "1-Theo ngày, 2-Theo tuần, 3-Theo tháng, 4-Theo năm")

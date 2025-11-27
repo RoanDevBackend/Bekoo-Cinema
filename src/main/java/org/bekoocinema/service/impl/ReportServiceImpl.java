@@ -42,6 +42,21 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<ReportChartTemplateResponse> getChartByBooking(LocalDate from, LocalDate to, int groupType) {
+        List<ReportChartTemplateResponse> responses = new ArrayList<>();
+        from = this.nextTo(from, groupType);
+        to = this.nextTo(to, groupType);
+        while (from.isBefore(to)) {
+            LocalDateTime start = from.atStartOfDay();
+            LocalDateTime end = this.nextTo(from, groupType).atStartOfDay();
+            long value = bookingRepository.countByBookingDateBetween(start, end);
+            responses.add(new ReportChartTemplateResponse(from, value));
+            from = nextTo(from, groupType);
+        }
+        return responses;
+    }
+
+    @Override
     public TotalReportResponse getTotalReportResponse() {
         long totalGenre = genreRepository.count();
         long totalMovie = movieRepository.count();
