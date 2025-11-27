@@ -54,6 +54,7 @@ public class WebSecurity {
         "/showtime/**",
         "/reset-seat/**",
         "/statistics",
+        "/report/**"
     };
 
     final String[] userEndpoints = {

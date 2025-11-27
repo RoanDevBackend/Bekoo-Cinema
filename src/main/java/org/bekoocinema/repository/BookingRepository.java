@@ -35,4 +35,10 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
 
     boolean existsByShowtimeId(String showtimeId);
 
+    @Query("SELECT SUM(b.totalPrice) " +
+            "FROM Booking b " +
+            "WHERE b.bookingDate >= :start " +
+            "AND b.bookingDate < :end "
+    )
+    Long getTotalPrice(LocalDateTime start, LocalDateTime end);
 }
