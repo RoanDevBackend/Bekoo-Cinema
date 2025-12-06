@@ -22,6 +22,7 @@ public class Cinema {
     String commune;
     String detailAddress;
     String phone;
+    @Column(columnDefinition = "text")
     String description;
     //Mất điện, đang nâng cấp, sửa,..
     String status;

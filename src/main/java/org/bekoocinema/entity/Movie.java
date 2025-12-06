@@ -35,10 +35,13 @@ public class Movie extends BaseEntity{
     LocalDateTime closeDate;
     String nation;
     int duration;
+    @Column(columnDefinition = "text")
     String note;
     @GenericField(sortable = Sortable.YES)
     int price;
+    @Column(columnDefinition = "text")
     String trailerUrl;
+    @Column(columnDefinition = "text")
     String posterUrl;
 
     @ManyToMany
