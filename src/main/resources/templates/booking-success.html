@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận đặt vé</title>
+</head>
+<style>
+    .footer {
+        text-align: center;
+        color: #666666;
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border-top: 1px solid #e0e0e0;
+    }
+</style>
+
+<body style="margin:0; padding:0; background:#f4f4f7; font-family:Arial, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:20px 0;">
+    <tr>
+        <td align="center">
+
+            <table width="600" cellpadding="0" cellspacing="0"
+                   style="background:white; border-radius:8px; overflow:hidden;">
+
+                <!-- HEADER -->
+                <tr>
+                    <td style="background:#1a56db; color:white; text-align:center; padding:20px;">
+                        <h2 style="margin:0;">🎉 ĐẶT VÉ THÀNH CÔNG!</h2>
+                        <p style="margin:8px 0 0;">Cảm ơn bạn đã đặt vé tại <strong th:text="${cinemaName}"></strong></p>
+                    </td>
+                </tr>
+
+                <!-- BODY -->
+                <tr>
+                    <td style="padding:25px 30px; color:#333;">
+
+                        <p>Xin chào <strong th:text="${fullName}"></strong>,</p>
+
+                        <p>Bạn đã đặt vé xem phim thành công. Đây là thông tin chi tiết:</p>
+
+                        <div style="text-align:center;">
+                            <img th:src="${posterUrl}" style="width:180px; border-radius:6px; margin:10px 0;">
+                        </div>
+
+                        <h3 style="color:#1a56db;">🎬 Thông tin phim</h3>
+                        <p><strong>Phim:</strong> <span th:text="${movieName}"></span></p>
+                        <p><strong>Thể loại:</strong> <span th:text="${genreName}"></span></p>
+
+                        <h3 style="color:#1a56db; margin-top:20px;">🕒 Suất chiếu</h3>
+
+                        <p><strong>Ngày:</strong> <span th:text="${showDate}"></span></p>
+                        <p><strong>Giờ:</strong> <span th:text="${showTime}"></span></p>
+                        <p><strong>Phòng:</strong> <span th:text="${roomName}"></span></p>
+                        <p><strong>Rạp:</strong> <span th:text="${cinemaName}"></span></p>
+                        <p><strong>Địa chỉ:</strong> <span th:text="${cinemaAddress}"></span></p>
+
+                        <h3 style="color:#1a56db; margin-top:20px;">🎟️ Thông tin vé</h3>
+
+                        <p><strong>Mã vé:</strong> <span th:text="${ticketId}"></span></p>
+                        <p><strong>Ghế:</strong> <span th:text="${seatNames}"></span></p>
+                        <p><strong>Ngày đặt:</strong> <span th:text="${bookingDate}"></span></p>
+                        <p><strong>Thanh toán:</strong> <span th:text="${paymentDate}"></span></p>
+                        <p><strong>Tổng tiền:</strong> <span style="color:#1a56db;" th:text="${totalPrice}"></span></p>
+
+                        <div style="text-align:center; margin:25px 0;">
+                            <p>📱 Quét mã QR để kiểm tra vé</p>
+                            <img th:src="'data:image/png;base64,' + ${qrBase64}"
+                                 style="width:140px; border:1px solid #eee; padding:5px; border-radius:6px;">
+                        </div>
+
+                        <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi ❤️</p>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="footer">
+                            <p style="margin: 0;">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi:</p>
+                            <p style="margin: 5px 0 0; font-weight: bold;">Số điện thoại: 0888 789 667 | Email: support.schedule@bekoo.com</p>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

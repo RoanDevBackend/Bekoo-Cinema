@@ -1,6 +1,10 @@
 package org.bekoocinema.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +18,19 @@ import org.bekoocinema.repository.*;
 import org.bekoocinema.request.booking.BookingRequest;
 import org.bekoocinema.response.booking.BookingResponse;
 import org.bekoocinema.service.BookingService;
+import org.bekoocinema.service.MailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,8 +44,12 @@ public class BookingServiceImpl implements BookingService {
     final RedisRepository redisRepository;
     final ObjectMapper objectMapper;
     final UserRepository userRepository;
+    final MailService mailService;
+    final SpringTemplateEngine templateEngine;
     @Value("${vnpay.return.url}")
     String vnp_ReturnUrl;
+    @Value("${qr.url}")
+    String qr_url;
     final String PAYMENT_STATUS_PENDING = "Chờ thanh toán";
 
     @Override
@@ -154,6 +168,7 @@ public class BookingServiceImpl implements BookingService {
                 booking.setPaymentStatus("Đã thanh toán thành công");
                 bookingRepository.save(booking);
                 value = "Thanh toán thành công!";
+                sendBookingSuccessEmail(booking);
             }else {
                 bookingRepository.delete(booking);
                 if (vnp_ResponseCode.equals("11"))
@@ -177,6 +192,72 @@ public class BookingServiceImpl implements BookingService {
             value = "Giao dịch không hợp lệ, vui lòng kết nối để biết thêm chi tiết";
         }
         return value;
+    }
+
+    @SneakyThrows
+    public void sendBookingSuccessEmail(Booking booking){
+        byte[] qrBytes;
+        try {
+            qrBytes = this.generateQrCode(qr_url);
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể tạo mã QR");
+        }
+        String qrBase64 = Base64.getEncoder().encodeToString(qrBytes);
+
+        // 2) Format date
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter fullFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        // 3) Build Thymeleaf context
+        Context context = new Context();
+        context.setVariable("fullName", booking.getFullName());
+        context.setVariable("movieName", booking.getMovieName());
+        context.setVariable("genreName", booking.getGenreName());
+        context.setVariable("posterUrl", booking.getPosterUrl());
+
+        context.setVariable("cinemaName", booking.getCinemaName());
+        context.setVariable("cinemaAddress", booking.getCinemaAddress());
+
+        context.setVariable("roomName", booking.getRoomName());
+        context.setVariable("showDate", booking.getStartTime().format(dateFmt));
+        context.setVariable("showTime", booking.getStartTime().format(timeFmt));
+
+        context.setVariable("seatNames", booking.getSeatNames());
+        context.setVariable("ticketId", booking.getId());
+
+        context.setVariable("bookingDate", booking.getBookingDate().format(fullFmt));
+        context.setVariable("paymentDate", booking.getPaymentDate().format(fullFmt));
+
+        context.setVariable("totalPrice",
+                NumberFormat.getCurrencyInstance(new Locale("vi", "VN"))
+                        .format(booking.getTotalPrice()));
+
+        context.setVariable("qrBase64", qrBase64);
+
+        // 4) Render HTML từ template
+        String html = templateEngine.process("booking-success", context);
+
+        // 5) Send email
+        mailService.sendMail(
+                "🎟️ Vé xem phim của bạn – " + booking.getMovieName(),
+                booking.getEmail(),
+                html,
+                true
+        );
+    }
+
+    public byte[] generateQrCode(String text) throws Exception {
+        int width = 300;
+        int height = 300;
+
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
+
+        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+
+        return pngOutputStream.toByteArray();
     }
 
     @SneakyThrows
