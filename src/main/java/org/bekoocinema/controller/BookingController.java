@@ -31,7 +31,7 @@ public class BookingController {
             summary = "Lấy đơn của user",
             security = { @SecurityRequirement(name = "bearerAuth") }
     )
-    @GetMapping(EndPointConstant.PUBLIC + "/booking/")
+    @GetMapping(EndPointConstant.PUBLIC + "/booking")
     public ApiResponse getBooking(@AuthenticationPrincipal User user, @RequestParam(required = false, defaultValue = "") String bookingId){
         return ApiResponse.success(200, "Thành công", bookingService.getBookings(user, bookingId));
     }

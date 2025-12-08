@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bekoocinema.request.booking.SeatSelectedRequest;
+import org.springframework.context.PayloadApplicationEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -86,6 +88,23 @@ public class SeatSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    @EventListener
+    @SneakyThrows
+    public void onSeatRelease(PayloadApplicationEvent<Map<String, Object>> event) {
+        Map<String, Object> payload = event.getPayload();
+        String showtimeId = payload.containsKey("showtimeId") ? (String) payload.get("showtimeId") : null;
+        List<String> seats = payload.containsKey("seatIdsSelected") ? (List<String>) payload.get("seatIdsSelected") : null;
+        if(showtimeId == null || seats == null || seats.isEmpty()){
+            return;
+        }
+        List<WebSocketSession> sessions = sessionInShowtimeMap.get(showtimeId);
+        if (sessions == null) return;
+        String json = objectMapper.writeValueAsString(seats);
+        for (WebSocketSession s : sessions) {
+            s.sendMessage(new TextMessage(json));
+        }
+    }
+
     //Helper function
     private String extractShowtimeIdFromQuery(String query) {
         if (query == null) return null;
@@ -106,6 +125,4 @@ public class SeatSocketHandler extends TextWebSocketHandler {
         }
         return seatSelectedResponse;
     }
-
-
 }

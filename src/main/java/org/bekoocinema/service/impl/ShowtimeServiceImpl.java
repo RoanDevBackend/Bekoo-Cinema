@@ -47,7 +47,9 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         
         LocalDateTime startTime = LocalDateTime.parse(createRequest.getStartTime());
         LocalDateTime endTime = LocalDateTime.parse(createRequest.getEndTime());
-        
+        if(startTime.isAfter(endTime)) {
+            throw new AppException(ErrorDetail.ERR_INVALID_TIME);
+        }
         boolean hasConflict = showtimeRepository.existsConflictingShowtime(
                 createRequest.getRoomId(),
                 startTime,

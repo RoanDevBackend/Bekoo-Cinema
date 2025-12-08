@@ -26,6 +26,7 @@ public enum ErrorDetail {
     , ERR_NEW_PASSWORD_SAME_AS_OLD(400, "Mật khẩu mới phải khác mật khẩu cũ")
     , ERR_COMMENT_PARENT_NOT_EXISTED(400, "Bình luận bạn trả lời hiện không tồn tại")
     , ERR_SEAT_BOOKED(400, "Ghế đã được đặt")
+    , ERR_INVALID_TIME(400, "Thời gian không hợp lệ")
     ;
 
     private final int code;
