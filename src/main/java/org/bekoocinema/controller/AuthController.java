@@ -59,7 +59,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Xác thực OTP quên mật khẩu")
-    @PostMapping("/verify-forgot-password/{OTP}")
+    @PostMapping("/verify-forgot-password")
     public ApiResponse verifyForgotPassword(@PathVariable String OTP, @RequestParam String email) throws AppException {
         authenticationService.verifyOtpForgotPassword(OTP, email);
         return ApiResponse.success(200, "Xác thực thành công, vui lòng đổi mật khẩu mới"
