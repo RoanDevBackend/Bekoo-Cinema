@@ -125,6 +125,11 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         }
 
         LocalDate startDate = date != null && !date.isBlank() ? LocalDate.parse(date) : LocalDate.now();
+        
+        LocalDate today = LocalDate.now();
+        if(startDate.isBefore(today)) {
+            throw new IllegalArgumentException("Không thể lấy lịch chiếu của ngày trong quá khứ. Vui lòng chọn từ ngày " + today + " trở đi");
+        }
 
         LocalDate endDate = startDate.plusDays(days);
 
@@ -158,11 +163,14 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
         List<CinemaScheduleMainResponse> cinemaSchedules = new ArrayList<>();
 
+        LocalDateTime now = LocalDateTime.now();
+        
         for(Cinema cinema : cinemas) {
             List<DateMovieScheduleResponse> dateSchedules = new ArrayList<>();
 
             for(LocalDate currentDate = startDate; currentDate.isBefore(endDate); currentDate = currentDate.plusDays(1)){
-                LocalDateTime dayStart = currentDate.atStartOfDay();
+                // Nếu là ngày hôm nay, chỉ lấy từ thời điểm hiện tại; ngày khác lấy từ đầu ngày
+                LocalDateTime dayStart = currentDate.equals(today) ? now : currentDate.atStartOfDay();
                 LocalDateTime dayEnd = currentDate.atTime(23, 59, 59);
 
                 List<Showtime> showtimes = showtimeRepository.findByCinemaAndDateRange(cinema.getId(), dayStart, dayEnd);
