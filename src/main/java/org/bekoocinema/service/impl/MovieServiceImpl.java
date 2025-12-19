@@ -217,15 +217,15 @@ public class MovieServiceImpl implements MovieService {
     @Transactional(readOnly = true)
     public PageResponse<?> getUpcomingMovie(int pageIndex, int pageSize) {
 
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime fiveHoursLater = now.plusHours(24);
-    Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        LocalDateTime now = LocalDateTime.now();
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
 
-    Page<Movie> upcomingMovies = movieRepository.findUpcomingMovies(now, fiveHoursLater, pageable);
+        Page<Movie> upcomingMovies = movieRepository.findUpcomingMovies(now, pageable);
         return PageResponse.<MovieResponse>builder()
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
                 .totalElements(upcomingMovies.getTotalElements())
+            .totalPages(upcomingMovies.getTotalPages())
                 .content(upcomingMovies.getContent()
                         .stream()
                         .map(movieMapper::toMovieResponse)
