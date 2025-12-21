@@ -21,7 +21,7 @@ public class CinemaController {
 
     final CinemaService cinemaService;
 
-    @Operation(summary = "Api dùng để tạo phim", security = {
+    @Operation(summary = "Api dùng để tạo rạp phim", security = {
             @SecurityRequirement(name = "bearerAuth")
     })
     @PostMapping("/cinema")

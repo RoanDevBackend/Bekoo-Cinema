@@ -11,7 +11,9 @@ import java.util.List;
 public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
     @Query("FROM Showtime st " +
             "WHERE st.movie.id = :movieId " +
-            "AND st.room.cinema.id = :cinemaId ")
+            "AND st.room.cinema.id = :cinemaId " +
+            "AND st.startTime >= CURRENT_TIMESTAMP " +
+            "ORDER BY st.startTime ASC")
     List<Showtime> getShowtime(String movieId, String cinemaId);
 
     @Query("SELECT COUNT(st) > 0 FROM Showtime st " +
