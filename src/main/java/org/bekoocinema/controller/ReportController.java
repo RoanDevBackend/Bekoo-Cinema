@@ -46,9 +46,7 @@ public class ReportController {
     }
 
     @GetMapping("/total")
-    @Operation(summary = "Báo cáo thống kê doanh thu đặt vé xem phim", parameters = {
-            @Parameter(name = "groupType", description = "1-Theo ngày, 2-Theo tuần, 3-Theo tháng, 4-Theo năm")
-    })
+    @Operation(summary = "Báo cáo thống kê doanh thu đặt vé xem phim")
     public ApiResponse totalAll() {
         var response = reportService.getTotalReportResponse();
         return ApiResponse.success(200, "OK", response);
