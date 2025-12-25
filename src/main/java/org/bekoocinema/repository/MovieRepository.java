@@ -40,18 +40,17 @@ public interface MovieRepository extends JpaRepository<Movie, String> {
 
     @Query("""
         FROM Movie m
-        WHERE m.releaseDate < :now
-        AND m.closeDate > :now
+        WHERE m.releaseDate <= :now
+        AND m.closeDate >= :now
     """)
     Page<Movie> findCurrentlyShowing(@Param("now") LocalDateTime now, Pageable pageable);
 
     @Query("""
         FROM Movie m
-        WHERE m.releaseDate BETWEEN :now AND :fiveHoursLater
+        WHERE m.releaseDate > :now
+        ORDER BY m.releaseDate ASC
     """)
-    Page<Movie> findUpcomingMovies(@Param("now") LocalDateTime now,
-                                   @Param("fiveHoursLater") LocalDateTime fiveHoursLater,
-                                   Pageable pageable);
+    Page<Movie> findUpcomingMovies(@Param("now") LocalDateTime now, Pageable pageable);
 
 
 }
